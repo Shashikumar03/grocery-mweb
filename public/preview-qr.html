@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scan to preview on phone</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 20px;
+        text-align: center;
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+      h1 {
+        font-size: 1.1rem;
+        margin: 0 0 8px;
+      }
+      p {
+        margin: 0 0 16px;
+        color: #64748b;
+        font-size: 0.9rem;
+      }
+      .card {
+        max-width: 360px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgb(15 23 42 / 0.1);
+      }
+      img {
+        display: block;
+        width: min(280px, 80vw);
+        height: auto;
+        margin: 0 auto 16px;
+        image-rendering: pixelated;
+      }
+      a.url {
+        word-break: break-all;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #0d9488;
+      }
+      .hint {
+        margin-top: 20px;
+        font-size: 0.8rem;
+        color: #64748b;
+      }
+      code {
+        background: #e2e8f0;
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Scan with your phone</h1>
+      <p>Same Wi‑Fi as this PC. Point the camera at the code.</p>
+      <img id="qr" alt="QR code for app URL" width="280" height="280" />
+      <a class="url" id="open" href="#" target="_blank" rel="noopener"></a>
+      <p class="hint">
+        Wrong network? Set your PC’s IPv4 in the address bar:<br />
+        <code>?ip=YOUR_LAN_IP&port=5173</code> (dev) or <code>port=4173</code> (preview)
+      </p>
+    </div>
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var ip = params.get("ip") || "192.168.1.35";
+        var port = params.get("port") || "5173";
+        var url = "http://" + ip + ":" + port + "/";
+        var img =
+          "https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=" +
+          encodeURIComponent(url);
+        document.getElementById("qr").src = img;
+        var a = document.getElementById("open");
+        a.href = url;
+        a.textContent = url;
+      })();
+    </script>
+  </body>
+</html>

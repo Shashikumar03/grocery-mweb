@@ -11,4 +11,6 @@
   --nav-h: 56px;
   --radius: 12px;
   --shadow: 0 1px 3px rgb(15 23 42 / 0.08);
+  /* Single-column “phone” width on all viewports */
+  --app-max-width: 428px;
 }

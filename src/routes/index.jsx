@@ -8,6 +8,9 @@ import { CartPage } from "../pages/cart/CartPage.jsx";
 import { CheckoutPage } from "../pages/checkout/CheckoutPage.jsx";
 import { OrdersPage } from "../pages/orders/OrdersPage.jsx";
 import { AccountPage } from "../pages/account/AccountPage.jsx";
+import { AddressesPage } from "../pages/account/AddressesPage.jsx";
+import { SignUpPage } from "../pages/auth/SignUpPage.jsx";
+import { LoginPage } from "../pages/auth/LoginPage.jsx";
 import { NotFoundPage } from "../pages/errors/NotFoundPage.jsx";
 
 export const routes = [
@@ -20,6 +23,9 @@ export const routes = [
   { path: "/checkout", element: <CheckoutPage /> },
   { path: "/orders", element: <OrdersPage /> },
   { path: "/account", element: <AccountPage /> },
+  { path: "/account/addresses", element: <AddressesPage /> },
+  { path: "/signup", element: <SignUpPage /> },
+  { path: "/auth/login", element: <LoginPage /> },
   { path: "/404", element: <NotFoundPage /> },
   { path: "*", element: <Navigate to="/404" replace /> },
 ];
