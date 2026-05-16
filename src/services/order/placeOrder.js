@@ -13,7 +13,7 @@ function postAuthHeaders() {
  * POST /api/place-order/{userId}/{addressId}?paymentMode=...
  * @param {number | string} userId
  * @param {number | string} addressId
- * @param {string} paymentMode e.g. CASH_ON_DELIVERY
+ * @param {string} paymentMode `CASH_ON_DELIVERY` | `ONLINE`
  */
 export async function placeOrder(userId, addressId, paymentMode) {
   const mode = String(paymentMode ?? "").trim();

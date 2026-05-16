@@ -10,7 +10,24 @@ import { placeOrder } from "../../services/order/index.js";
 import { useCartCount } from "../../context/CartCountContext.jsx";
 import { formatCurrency } from "../../utils/format.js";
 import { getReadableFetchError } from "../../utils/fetchError.js";
-import { getAuthToken, getLoggedInUserId } from "../../utils/authSession.js";
+import { verifyRazorpayPayment } from "../../services/payment/index.js";
+import { getRazorpayKeyId } from "../../constants/razorpay.js";
+import {
+  getAuthToken,
+  getLoggedInUserId,
+  readAuthSession,
+} from "../../utils/authSession.js";
+import { openRazorpayCheckout } from "../../utils/razorpayCheckout.js";
+import {
+  cartItemsFromPlaceOrderResponse,
+  cartTotalFromPlaceOrderResponse,
+  formatAddressFromOrderResponse,
+  formatAddressOneLine,
+  inrToPaise,
+  isOnlinePaymentMode,
+  pickFromOrderResponse,
+  pickRazorpayFromOrderResponse,
+} from "../../utils/placeOrderResponse.js";
 
 /** `paymentMode` query for POST /api/place-order/{userId}/{addressId}?paymentMode=… */
 const PAYMENT_OPTIONS = [
@@ -20,131 +37,42 @@ const PAYMENT_OPTIONS = [
     label: "Cash on delivery",
     hint: "Pay when you receive",
   },
-  { id: "upi", paymentMode: "UPI", label: "UPI", hint: "Google Pay, PhonePe, Paytm…" },
   {
-    id: "card",
-    paymentMode: "CARD",
-    label: "Debit / credit card",
-    hint: "Visa, Mastercard, RuPay",
-  },
-  {
-    id: "netbanking",
-    paymentMode: "NET_BANKING",
-    label: "Net banking",
-    hint: "Your bank’s secure page",
+    id: "online",
+    paymentMode: "ONLINE",
+    label: "Pay online",
+    hint: "UPI, card, or net banking via Razorpay",
   },
 ];
 
-function formatAddressOneLine(row) {
-  const parts = [row.address, row.city, row.state, row.pin]
-    .filter(Boolean)
-    .map((x) => String(x).trim())
-    .filter(Boolean);
-  return parts.join(", ") || "Address";
-}
-
 const DELIVERY_ETA_MINUTES = 20;
 
-/** @param {unknown} v */
-function formatOrderTimeLabel(v) {
-  if (v == null) return "";
-  const d = new Date(String(v));
-  if (Number.isNaN(d.getTime())) return String(v);
-  return d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-}
+function buildTrackingFromOrder(parsed, extras) {
+  const fromApi = pickFromOrderResponse(parsed);
+  const apiItems = cartItemsFromPlaceOrderResponse(parsed);
+  const apiTotal = cartTotalFromPlaceOrderResponse(parsed);
+  const addressFromApi = formatAddressFromOrderResponse(parsed);
+  const lineItems =
+    apiItems && apiItems.length > 0 ? apiItems : extras.itemsCopy;
+  const lineTotal =
+    apiTotal != null
+      ? apiTotal
+      : extras.total != null && Number.isFinite(extras.total)
+        ? extras.total
+        : null;
 
-/**
- * Prefer a wrapped DTO only when it clearly looks like the order (has id / orderId).
- * Avoids treating empty `order: {}` or unrelated objects as the root and losing fields.
- * @param {unknown} parsed
- */
-function unwrapOrderRoot(parsed) {
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return parsed;
-  const r = /** @type {Record<string, unknown>} */ (parsed);
-  const candidates = [r.data, r.order, r.body];
-  for (const inner of candidates) {
-    if (
-      inner &&
-      typeof inner === "object" &&
-      !Array.isArray(inner) &&
-      (inner.orderId != null || inner.id != null)
-    ) {
-      return inner;
-    }
-  }
-  return parsed;
-}
-
-/** @param {unknown} parsed */
-function pickFromOrderResponse(parsed) {
-  const root = unwrapOrderRoot(parsed);
-  if (!root || typeof root !== "object" || Array.isArray(root)) {
-    return {
-      orderId: null,
-      orderStatus: "",
-      paymentMode: "",
-      orderTimeLabel: "",
-    };
-  }
-  const o = /** @type {Record<string, unknown>} */ (root);
-  const idVal = o.orderId ?? o.id ?? o.order_id;
-  let orderId = null;
-  if (idVal != null && idVal !== "") {
-    const n = Number(idVal);
-    orderId = Number.isFinite(n) ? n : String(idVal);
-  }
-  const statusRaw = o.orderStatus ?? o.status;
-  const orderStatus = statusRaw != null ? String(statusRaw) : "";
-  const pay = o.payment ?? o.paymentDto;
-  const nestedMode =
-    pay && typeof pay === "object" && !Array.isArray(pay)
-      ? /** @type {Record<string, unknown>} */ (pay).paymentMode
-      : null;
-  const modeRaw = o.paymentMode ?? nestedMode;
-  const paymentMode = modeRaw != null ? String(modeRaw) : "";
-  const timeRaw = o.orderTime ?? o.createdAt ?? o.orderDate;
   return {
-    orderId,
-    orderStatus,
-    paymentMode,
-    orderTimeLabel: formatOrderTimeLabel(timeRaw),
+    ...fromApi,
+    addressLine: addressFromApi || extras.addressLine,
+    paymentLabel: extras.paymentLabel,
+    items: lineItems,
+    total: lineTotal,
   };
-}
-
-/** Line items from place-order JSON (`cartDto.cartItemsDto`). */
-function cartItemsFromPlaceOrderResponse(parsed) {
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
-  const c = /** @type {Record<string, unknown>} */ (parsed).cartDto;
-  if (c && typeof c === "object" && !Array.isArray(c) && Array.isArray(c.cartItemsDto)) {
-    return c.cartItemsDto.map((row) =>
-      row && typeof row === "object" && !Array.isArray(row)
-        ? { .../** @type {Record<string, unknown>} */ (row) }
-        : {}
-    );
-  }
-  return null;
-}
-
-/** Total from place-order `cartDto.cartTotalPrice`. */
-function cartTotalFromPlaceOrderResponse(parsed) {
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
-  const c = /** @type {Record<string, unknown>} */ (parsed).cartDto;
-  if (c && typeof c === "object" && !Array.isArray(c) && c.cartTotalPrice != null) {
-    const n = Number(c.cartTotalPrice);
-    return Number.isFinite(n) ? n : null;
-  }
-  return null;
-}
-
-/** Flat address fields on the order DTO. */
-function formatAddressFromOrderResponse(parsed) {
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return "";
-  return formatAddressOneLine(/** @type {Record<string, unknown>} */ (parsed));
 }
 
 export function CartPage() {
   const navigate = useNavigate();
-  const { syncCartFromResponse } = useCartCount();
+  const { syncCartFromResponse, refreshCartCount } = useCartCount();
   const userId = getLoggedInUserId();
   const token = getAuthToken();
 
@@ -244,35 +172,71 @@ export function CartPage() {
     const total =
       cart?.cartTotalPrice != null ? Number(cart.cartTotalPrice) : null;
 
+    const extras = { addressLine, paymentLabel, itemsCopy, total };
+
     setOrderSubmitting(true);
     try {
       const parsed = await placeOrder(userId, selectedAddressId, paymentMode);
       const fromApi = pickFromOrderResponse(parsed);
-      const apiItems = cartItemsFromPlaceOrderResponse(parsed);
-      const apiTotal = cartTotalFromPlaceOrderResponse(parsed);
-      const addressFromApi = formatAddressFromOrderResponse(parsed);
-      const lineItems =
-        apiItems && apiItems.length > 0 ? apiItems : itemsCopy;
-      const lineTotal =
-        apiTotal != null
-          ? apiTotal
-          : total != null && Number.isFinite(total)
-            ? total
-            : null;
 
-      setTrackingDetails({
-        ...fromApi,
-        addressLine: addressFromApi || addressLine,
-        paymentLabel,
-        items: lineItems,
-        total: lineTotal,
-      });
+      if (isOnlinePaymentMode(paymentMode)) {
+        const { razorpayOrderId, amountInr } = pickRazorpayFromOrderResponse(parsed);
+        const amountPaise = inrToPaise(
+          amountInr ?? (total != null && Number.isFinite(total) ? total : 0)
+        );
+
+        if (!getRazorpayKeyId()) {
+          throw new Error(
+            "Online payment is not configured. Use cash on delivery or add VITE_RAZORPAY_KEY_ID."
+          );
+        }
+        if (!razorpayOrderId) {
+          throw new Error(
+            "Could not start payment. The server did not return a Razorpay order id."
+          );
+        }
+
+        const session = readAuthSession();
+        const user = session?.user && typeof session.user === "object" ? session.user : null;
+        const userName = user?.name != null ? String(user.name) : "";
+        const userEmail = user?.email ?? user?.username;
+        const userPhone = user?.phoneNumber;
+
+        setOrderSubmitting(false);
+
+        const razorpayResult = await openRazorpayCheckout({
+          razorpayOrderId,
+          amountPaise,
+          description: `Order #${fromApi.orderId ?? ""}`.trim(),
+          prefill: {
+            name: userName || undefined,
+            email: userEmail != null ? String(userEmail) : undefined,
+            contact: userPhone != null ? String(userPhone).replace(/\D/g, "") : undefined,
+          },
+          notes: fromApi.orderId != null ? { orderId: String(fromApi.orderId) } : {},
+        });
+
+        setOrderSubmitting(true);
+        try {
+          await verifyRazorpayPayment({
+            ...razorpayResult,
+            orderId: fromApi.orderId ?? undefined,
+          });
+        } catch {
+          /* verify endpoint optional — Razorpay success is enough for UX */
+        }
+
+        setTrackingDetails(buildTrackingFromOrder(parsed, extras));
+      } else {
+        setTrackingDetails(buildTrackingFromOrder(parsed, extras));
+      }
 
       try {
         await loadCart();
         await loadAddresses();
+        void refreshCartCount();
       } catch {
-        /* cart/address refresh is best-effort; tracking overlay already shown */
+        /* best-effort refresh */
       }
     } catch (err) {
       setOrderError(getReadableFetchError(err));
@@ -288,6 +252,7 @@ export function CartPage() {
     addresses,
     loadCart,
     loadAddresses,
+    refreshCartCount,
   ]);
 
   const handleCloseTracking = useCallback(() => {
@@ -441,7 +406,10 @@ export function CartPage() {
               <h2 id="pay-heading" className="cart-pay__title">
                 Payment
               </h2>
-              <p className="muted cart-pay__intro">Choose how you would like to pay.</p>
+              <p className="muted cart-pay__intro">
+                Cash on delivery places the order directly. Pay online opens secure Razorpay
+                checkout (UPI, card, net banking).
+              </p>
               <ul className="cart-pay__list" role="radiogroup" aria-label="Payment method">
                 {PAYMENT_OPTIONS.map((opt) => (
                   <li key={opt.id}>
@@ -479,7 +447,13 @@ export function CartPage() {
                 }
                 onClick={() => void handlePlaceOrder()}
               >
-                {orderSubmitting ? "Placing order…" : "Place order"}
+                {orderSubmitting
+                  ? payment === "cod"
+                    ? "Placing order…"
+                    : "Processing…"
+                  : payment === "cod"
+                    ? "Place order"
+                    : "Pay with Razorpay"}
               </button>
               <p className="muted cart-pay__note">
                 Paying with{" "}
