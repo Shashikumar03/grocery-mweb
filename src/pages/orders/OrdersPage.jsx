@@ -20,33 +20,33 @@ function getOrderStatus(o) {
 }
 
 /** @param {Record<string, unknown>} o */
+function getPaymentDto(o) {
+  const p = o.paymentDto ?? o.payment;
+  if (p && typeof p === "object" && !Array.isArray(p)) {
+    return /** @type {Record<string, unknown>} */ (p);
+  }
+  return null;
+}
+
+/** @param {Record<string, unknown>} o */
 function getPaymentMode(o) {
-  const p = o.payment;
-  const nested =
-    p && typeof p === "object" && !Array.isArray(p)
-      ? /** @type {Record<string, unknown>} */ (p).paymentMode
-      : null;
-  const m = o.paymentMode ?? nested;
+  const payment = getPaymentDto(o);
+  const m = o.paymentMode ?? payment?.paymentMode;
   return m != null ? String(m) : "—";
 }
 
 /** @param {Record<string, unknown>} o */
 function getPaymentStatus(o) {
-  const p = o.payment;
-  const nested =
-    p && typeof p === "object" && !Array.isArray(p)
-      ? /** @type {Record<string, unknown>} */ (p).paymentStatus
-      : null;
-  const s = o.paymentStatus ?? nested;
+  const payment = getPaymentDto(o);
+  const s = o.paymentStatus ?? payment?.paymentStatus;
   return s != null ? String(s).trim() : "";
 }
 
 /** @param {Record<string, unknown>} o */
 function getPaymentAmount(o) {
-  const p = o.payment;
-  if (p && typeof p === "object" && !Array.isArray(p)) {
-    const row = /** @type {Record<string, unknown>} */ (p);
-    const amt = row.paymentAmount ?? row.amount;
+  const payment = getPaymentDto(o);
+  if (payment) {
+    const amt = payment.paymentAmount ?? payment.amount;
     if (amt != null) {
       const n = Number(amt);
       if (Number.isFinite(n)) return n;

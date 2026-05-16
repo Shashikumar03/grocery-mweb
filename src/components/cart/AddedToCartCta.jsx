@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 
-export const ADDED_TO_CART_AUTO_CLOSE_MS = 3000;
+export const ADDED_TO_CART_AUTO_CLOSE_MS = 2000;
 
 /**
  * @param {{
