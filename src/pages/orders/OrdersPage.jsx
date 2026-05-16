@@ -14,9 +14,19 @@ function getOrderId(o) {
 }
 
 /** @param {Record<string, unknown>} o */
-function getOrderStatus(o) {
-  const s = o.orderStatus ?? o.status;
-  return s != null ? String(s) : "—";
+function getDeliveryDto(o) {
+  const d = o.deliveryDto ?? o.delivery;
+  if (d && typeof d === "object" && !Array.isArray(d)) {
+    return /** @type {Record<string, unknown>} */ (d);
+  }
+  return null;
+}
+
+/** @param {Record<string, unknown>} o */
+function getDeliveryStatus(o) {
+  const delivery = getDeliveryDto(o);
+  const s = o.deliveryStatus ?? delivery?.deliveryStatus;
+  return s != null ? String(s).trim() : "—";
 }
 
 /** @param {Record<string, unknown>} o */
@@ -151,7 +161,7 @@ export function OrdersPage() {
                   <li key={key} className="order-history__card">
                     <div className="order-history__head">
                       <span className="order-history__id">Order #{id}</span>
-                      <span className="order-history__status">{getOrderStatus(o)}</span>
+                      <span className="order-history__status">{getDeliveryStatus(o)}</span>
                     </div>
                     <dl className="order-history__dl">
                       <div className="order-history__row">
