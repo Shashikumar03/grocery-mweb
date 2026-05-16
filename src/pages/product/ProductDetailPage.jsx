@@ -3,6 +3,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { Screen } from "../../components/common/Screen.jsx";
 import { AuthPromptModal } from "../../components/auth/AuthPromptModal.jsx";
 import { fetchProductById } from "../../services/catalog/index.js";
+import { AddedToCartCta } from "../../components/cart/AddedToCartCta.jsx";
 import { addProductToCart } from "../../services/cart/index.js";
 import { useCartCount } from "../../context/CartCountContext.jsx";
 import { formatCurrency } from "../../utils/format.js";
@@ -22,7 +23,7 @@ export function ProductDetailPage() {
   const [cartMessage, setCartMessage] = useState("");
   const [cartError, setCartError] = useState("");
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const { refreshCartCount } = useCartCount();
+  const { itemCount, refreshCartCount } = useCartCount();
 
   useEffect(() => {
     let cancelled = false;
@@ -74,8 +75,8 @@ export function ProductDetailPage() {
         productId: Number(product.id),
         quantity,
       });
+      await refreshCartCount();
       setCartMessage("Added to cart.");
-      void refreshCartCount();
     } catch (err) {
       setCartError(getReadableFetchError(err));
     } finally {
@@ -180,13 +181,6 @@ export function ProductDetailPage() {
               {cartError}
             </p>
           ) : null}
-          {cartMessage ? (
-            <p className="form-success" role="status">
-              {cartMessage}{" "}
-              <Link to="/cart">View cart</Link>
-            </p>
-          ) : null}
-
           <button
             type="button"
             className="form-submit pdp-cart-btn"
@@ -195,6 +189,13 @@ export function ProductDetailPage() {
           >
             {cartSubmitting ? "Adding…" : available ? "Add to cart" : "Out of stock"}
           </button>
+
+          {cartMessage ? (
+            <AddedToCartCta
+              itemCount={itemCount}
+              onDismiss={() => setCartMessage("")}
+            />
+          ) : null}
         </>
       ) : null}
       <AuthPromptModal

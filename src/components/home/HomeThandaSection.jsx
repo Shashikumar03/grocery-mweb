@@ -14,12 +14,13 @@ import { getAuthToken, getLoggedInUserId } from "../../utils/authSession.js";
 export const BEVERAGES_CATEGORY_ID = 5;
 
 export function HomeThandaSection() {
-  const { refreshCartCount } = useCartCount();
+  const { itemCount, refreshCartCount } = useCartCount();
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [addingId, setAddingId] = useState(null);
-  const [toast, setToast] = useState("");
+  const [lastAddedId, setLastAddedId] = useState(null);
+  const [toastError, setToastError] = useState("");
   const [authOpen, setAuthOpen] = useState(false);
 
   useEffect(() => {
@@ -56,17 +57,18 @@ export function HomeThandaSection() {
         return;
       }
 
-      setToast("");
+      setToastError("");
+      setLastAddedId(null);
       setAddingId(productId);
       try {
         await addProductToCart(userId, {
           productId: Number(productId),
           quantity: 1,
         });
-        setToast("Added to cart.");
-        void refreshCartCount();
+        await refreshCartCount();
+        setLastAddedId(productId);
       } catch (err) {
-        setToast(getReadableFetchError(err));
+        setToastError(getReadableFetchError(err));
       } finally {
         setAddingId(null);
       }
@@ -109,9 +111,9 @@ export function HomeThandaSection() {
           {error}
         </p>
       ) : null}
-      {toast ? (
-        <p className={toast.startsWith("Added") ? "form-success" : "form-error"} role="status">
-          {toast}
+      {toastError ? (
+        <p className="form-error" role="alert">
+          {toastError}
         </p>
       ) : null}
 
@@ -129,6 +131,9 @@ export function HomeThandaSection() {
                 product={p}
                 onAddToCart={handleAddToCart}
                 adding={addingId === pid}
+                justAdded={lastAddedId === pid}
+                cartItemCount={itemCount}
+                onDismissCartCta={() => setLastAddedId(null)}
               />
             );
           })}

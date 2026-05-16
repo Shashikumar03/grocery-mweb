@@ -5,7 +5,11 @@ import { CartPageShimmer } from "../../components/common/Shimmer.jsx";
 import { CartLineItem } from "../../components/cart/CartLineItem.jsx";
 import { OrderTrackingOverlay } from "../../components/cart/OrderTrackingOverlay.jsx";
 import { fetchDeliveryAddresses, getDeliveryAddressId } from "../../services/address/index.js";
-import { fetchCart, updateCartItemQuantity } from "../../services/cart/index.js";
+import {
+  fetchCart,
+  removeCartItem,
+  updateCartItemQuantity,
+} from "../../services/cart/index.js";
 import { placeOrder } from "../../services/order/index.js";
 import { useCartCount } from "../../context/CartCountContext.jsx";
 import { formatCurrency } from "../../utils/format.js";
@@ -77,6 +81,7 @@ export function CartPage() {
   const [orderError, setOrderError] = useState("");
   const [trackingDetails, setTrackingDetails] = useState(null);
   const [qtyUpdatingId, setQtyUpdatingId] = useState(null);
+  const [removingProductId, setRemovingProductId] = useState(null);
   const [qtyError, setQtyError] = useState("");
 
   const loadCart = useCallback(async () => {
@@ -319,6 +324,35 @@ export function CartPage() {
     [userId, applyCartResponse, syncCartFromResponse, loadCart]
   );
 
+  const handleRemoveCartItem = useCallback(
+    async (productId) => {
+      if (userId == null || productId == null) return;
+      setQtyError("");
+      setRemovingProductId(productId);
+      try {
+        const parsed = await removeCartItem(userId, productId);
+        applyCartResponse(parsed);
+        try {
+          const data = await fetchCart(userId, { clearSessionOn401: false });
+          setCart(data);
+          syncCartFromResponse(data);
+        } catch {
+          /* keep optimistic response if refresh fails */
+        }
+      } catch (err) {
+        setQtyError(getReadableFetchError(err));
+        try {
+          await loadCart();
+        } catch {
+          /* ignore */
+        }
+      } finally {
+        setRemovingProductId(null);
+      }
+    },
+    [userId, applyCartResponse, syncCartFromResponse, loadCart]
+  );
+
   const items = sortCartItems(
     Array.isArray(cart?.cartItemsDto) ? cart.cartItemsDto : []
   );
@@ -389,14 +423,22 @@ export function CartPage() {
               <div className="cart-lines">
                 {items.map((it) => {
                   const lineId = it.cartItemId ?? it.productId;
+                  const productId = it.productId;
+                  const lineBusy =
+                    qtyUpdatingId === lineId ||
+                    (productId != null && removingProductId === productId);
                   return (
                     <CartLineItem
                       key={lineId}
                       item={it}
-                      quantityUpdating={qtyUpdatingId === lineId}
+                      lineBusy={lineBusy}
                       onQuantityChange={(action) => {
                         if (it.cartItemId == null) return;
                         void handleCartItemQuantity(it.cartItemId, action);
+                      }}
+                      onRemove={() => {
+                        if (productId == null) return;
+                        void handleRemoveCartItem(productId);
                       }}
                     />
                   );
