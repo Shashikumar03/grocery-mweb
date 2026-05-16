@@ -12,8 +12,7 @@ import { getProductImageUrlForDisplay } from "../../utils/productImage.js";
 export function CartLineItem({ item, onQuantityChange, quantityUpdating = false }) {
   const [imgFailed, setImgFailed] = useState(false);
   const qty = Number(item.quantity) || 0;
-  const unit = Number(item.price) || 0;
-  const lineTotal = unit * qty;
+  const linePrice = Number(item.price) || 0;
   const rawUrl =
     typeof item.imageUrl === "string"
       ? item.imageUrl
@@ -46,7 +45,9 @@ export function CartLineItem({ item, onQuantityChange, quantityUpdating = false 
       </div>
       <div className="cart-line__body">
         <h3 className="cart-line__name">{name}</h3>
-        <p className="cart-line__meta muted">{formatCurrency(unit, "INR")} each</p>
+        {canChangeQty ? null : (
+          <p className="cart-line__meta muted">Qty: {qty}</p>
+        )}
         {canChangeQty ? (
           <div className="cart-line__qty" aria-label={`Quantity for ${name}`}>
             <button
@@ -71,11 +72,9 @@ export function CartLineItem({ item, onQuantityChange, quantityUpdating = false 
               +
             </button>
           </div>
-        ) : (
-          <p className="cart-line__meta muted">Qty: {qty}</p>
-        )}
+        ) : null}
       </div>
-      <p className="cart-line__total">{formatCurrency(lineTotal, "INR")}</p>
+      <p className="cart-line__total">{formatCurrency(linePrice, "INR")}</p>
     </article>
   );
 }

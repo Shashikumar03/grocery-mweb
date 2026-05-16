@@ -1,5 +1,6 @@
 import { apiUrl, parseJsonResponseText, throwIfApiFailure } from "../api/client.js";
 import { getAuthToken } from "../../utils/authSession.js";
+import { normalizeCart } from "../../utils/cartItems.js";
 
 /** @typedef {"add" | "dec"} CartItemQuantityAction */
 
@@ -26,5 +27,5 @@ export async function updateCartItemQuantity(cartItemId, itemQuantity) {
   const raw = await res.text();
   const parsed = parseJsonResponseText(raw);
   throwIfApiFailure(res, parsed);
-  return parsed;
+  return normalizeCart(parsed);
 }

@@ -28,6 +28,7 @@ import {
   pickFromOrderResponse,
   pickRazorpayFromOrderResponse,
 } from "../../utils/placeOrderResponse.js";
+import { normalizeCart, sortCartItems } from "../../utils/cartItems.js";
 
 const PAYMENT_MODE = "ONLINE";
 const PAYMENT_LABEL = "Pay";
@@ -271,17 +272,18 @@ export function CartPage() {
 
   const applyCartResponse = useCallback(
     (data) => {
-      if (data && typeof data === "object" && !Array.isArray(data)) {
-        const o = /** @type {Record<string, unknown>} */ (data);
+      const normalized = normalizeCart(data);
+      if (normalized && typeof normalized === "object" && !Array.isArray(normalized)) {
+        const o = /** @type {Record<string, unknown>} */ (normalized);
         if (Array.isArray(o.cartItemsDto)) {
-          setCart(data);
-          syncCartFromResponse(data);
+          setCart(normalized);
+          syncCartFromResponse(normalized);
           return;
         }
         if (o.cartDto && typeof o.cartDto === "object" && !Array.isArray(o.cartDto)) {
-          setCart(o.cartDto);
-          syncCartFromResponse(o.cartDto);
-          return;
+          const cartDto = normalizeCart(o.cartDto);
+          setCart(cartDto);
+          syncCartFromResponse(cartDto);
         }
       }
     },
@@ -317,7 +319,9 @@ export function CartPage() {
     [userId, applyCartResponse, syncCartFromResponse, loadCart]
   );
 
-  const items = Array.isArray(cart?.cartItemsDto) ? cart.cartItemsDto : [];
+  const items = sortCartItems(
+    Array.isArray(cart?.cartItemsDto) ? cart.cartItemsDto : []
+  );
   const total =
     cart?.cartTotalPrice != null ? Number(cart.cartTotalPrice) : null;
   const discount =

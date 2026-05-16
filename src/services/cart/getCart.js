@@ -1,5 +1,6 @@
 import { apiUrl, parseJsonResponseText, throwIfApiFailure } from "../api/client.js";
 import { getAuthToken } from "../../utils/authSession.js";
+import { normalizeCart } from "../../utils/cartItems.js";
 
 /**
  * GET /api/v1/carts/{userId}
@@ -24,5 +25,5 @@ export async function fetchCart(userId, options = {}) {
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
     throw new Error("Unexpected response from cart API");
   }
-  return parsed;
+  return normalizeCart(parsed);
 }
