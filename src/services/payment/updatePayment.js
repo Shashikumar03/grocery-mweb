@@ -47,7 +47,7 @@ export async function updatePayment(rozerpayId, paymentStatus, paymentId) {
       const raw = await res.text();
       const parsed = raw ? parseJsonResponseText(raw) : null;
       if (res.status === 404) continue;
-      throwIfApiFailure(res, parsed);
+      throwIfApiFailure(res, parsed, { clearSessionOn401: false });
       return parsed;
     } catch (err) {
       lastError = err;

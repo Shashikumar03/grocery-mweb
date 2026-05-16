@@ -42,7 +42,7 @@ export function CartCountProvider({ children }) {
       return;
     }
     try {
-      const data = await fetchCart(uid);
+      const data = await fetchCart(uid, { clearSessionOn401: false });
       syncCartFromResponse(data);
     } catch {
       setItemCount(0);

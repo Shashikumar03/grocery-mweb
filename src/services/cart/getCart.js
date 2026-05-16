@@ -4,8 +4,9 @@ import { getAuthToken } from "../../utils/authSession.js";
 /**
  * GET /api/v1/carts/{userId}
  * @param {number | string} userId
+ * @param {{ clearSessionOn401?: boolean }} [options]
  */
-export async function fetchCart(userId) {
+export async function fetchCart(userId, options = {}) {
   const token = getAuthToken();
   const headers = {};
   if (token) {
@@ -19,7 +20,7 @@ export async function fetchCart(userId) {
 
   const raw = await res.text();
   const parsed = parseJsonResponseText(raw);
-  throwIfApiFailure(res, parsed);
+  throwIfApiFailure(res, parsed, options);
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
     throw new Error("Unexpected response from cart API");
   }

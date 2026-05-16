@@ -63,6 +63,24 @@ export async function openRazorpayCheckout(input) {
   }
 
   return new Promise((resolve, reject) => {
+    let settled = false;
+
+    const finishSuccess = (response) => {
+      if (settled) return;
+      settled = true;
+      resolve({
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_signature: response.razorpay_signature,
+      });
+    };
+
+    const finishFailure = (err) => {
+      if (settled) return;
+      settled = true;
+      reject(err instanceof Error ? err : new Error(String(err)));
+    };
+
     /** @type {Record<string, unknown>} */
     const options = {
       key,
@@ -74,17 +92,13 @@ export async function openRazorpayCheckout(input) {
       notes: input.notes ?? {},
       theme: { color: "#0d9488" },
     };
-    // Amount must match the Razorpay order created on the server — do not override here.
     options.handler = (response) => {
-      resolve({
-        razorpay_payment_id: response.razorpay_payment_id,
-        razorpay_order_id: response.razorpay_order_id,
-        razorpay_signature: response.razorpay_signature,
-      });
+      finishSuccess(response);
     };
     options.modal = {
       ondismiss() {
-        reject(new Error("Payment cancelled."));
+        if (settled) return;
+        finishFailure(new Error("Payment cancelled."));
       },
     };
 
@@ -97,7 +111,7 @@ export async function openRazorpayCheckout(input) {
         e?.code ? `(${e.code})` : null,
       ].filter(Boolean);
       const desc = parts.length > 0 ? parts.join(" ") : "Payment failed. Please try again.";
-      reject(new Error(desc));
+      finishFailure(new Error(desc));
     });
     rzp.open();
   });

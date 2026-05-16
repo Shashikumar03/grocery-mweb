@@ -158,10 +158,12 @@ function isApiFailureEnvelope(parsed) {
  * Throws if HTTP failed or JSON body reports `success: false` (common for your API).
  * @param {Response} res
  * @param {unknown} parsed
+ * @param {{ clearSessionOn401?: boolean }} [options]
  */
-export function throwIfApiFailure(res, parsed) {
+export function throwIfApiFailure(res, parsed, options = {}) {
+  const { clearSessionOn401 = true } = options;
   if (!res.ok) {
-    if (res.status === 401) {
+    if (res.status === 401 && clearSessionOn401) {
       clearAuthSession();
     }
     throw new Error(formatApiErrorMessage(parsed, res.status));

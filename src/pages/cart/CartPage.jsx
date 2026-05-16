@@ -17,7 +17,8 @@ import {
   getLoggedInUserId,
   readAuthSession,
 } from "../../utils/authSession.js";
-import { openRazorpayCheckout } from "../../utils/razorpayCheckout.js";
+import { openCheckoutWithRetry } from "../../utils/openCheckoutWithRetry.js";
+import { loadRazorpayScript } from "../../utils/loadRazorpayScript.js";
 import {
   cartItemsFromPlaceOrderResponse,
   cartTotalFromPlaceOrderResponse,
@@ -134,6 +135,14 @@ export function CartPage() {
     loadAddresses();
   }, [loadAddresses]);
 
+  useEffect(() => {
+    if (userId != null && getRazorpayKeyId()) {
+      loadRazorpayScript().catch(() => {
+        /* optional preload */
+      });
+    }
+  }, [userId]);
+
   const handlePlaceOrder = useCallback(async () => {
     setOrderError("");
     if (userId == null) return;
@@ -145,12 +154,15 @@ export function CartPage() {
       setOrderError("Choose a delivery address.");
       return;
     }
+    const cartLines = Array.isArray(cart?.cartItemsDto) ? cart.cartItemsDto : [];
+    if (cartLines.length === 0) {
+      setOrderError("Your cart is empty. Add products, then tap Pay now.");
+      return;
+    }
     const addressRow = addresses.find((r) => getDeliveryAddressId(r) === selectedAddressId);
     const addressLine = addressRow ? formatAddressOneLine(addressRow) : "";
     const paymentLabel = PAYMENT_LABEL;
-    const itemsCopy = Array.isArray(cart?.cartItemsDto)
-      ? cart.cartItemsDto.map((row) => ({ ...row }))
-      : [];
+    const itemsCopy = cartLines.map((row) => ({ ...row }));
     const total =
       cart?.cartTotalPrice != null ? Number(cart.cartTotalPrice) : null;
 
@@ -183,9 +195,9 @@ export function CartPage() {
       const userEmail = user?.email ?? user?.username;
       const userPhone = user?.phoneNumber;
 
-      setOrderSubmitting(false);
+      await loadRazorpayScript();
 
-      const razorpayResult = await openRazorpayCheckout({
+      const razorpayResult = await openCheckoutWithRetry({
         razorpayOrderId,
         amountPaise,
         description: `Order #${fromApi.orderId ?? ""}`.trim(),
@@ -197,7 +209,8 @@ export function CartPage() {
         notes: fromApi.orderId != null ? { orderId: String(fromApi.orderId) } : {},
       });
 
-      setOrderSubmitting(true);
+      setTrackingDetails(buildTrackingFromOrder(parsed, extras));
+
       try {
         await updatePayment(
           razorpayResult.razorpay_order_id,
@@ -215,17 +228,26 @@ export function CartPage() {
         }
       }
 
-      setTrackingDetails(buildTrackingFromOrder(parsed, extras));
-
       try {
-        await loadCart();
-        await loadAddresses();
-        void refreshCartCount();
+        const data = await fetchCart(userId, { clearSessionOn401: false });
+        setCart(data);
+        syncCartFromResponse(data);
       } catch {
         /* best-effort refresh */
       }
     } catch (err) {
-      setOrderError(getReadableFetchError(err));
+      const msg = getReadableFetchError(err);
+      setOrderError(
+        msg.includes("cancelled")
+          ? msg
+          : `${msg} If your cart looks empty, add items again and tap Pay now.`
+      );
+      try {
+        await loadCart();
+        void refreshCartCount();
+      } catch {
+        /* ignore */
+      }
     } finally {
       setOrderSubmitting(false);
     }
