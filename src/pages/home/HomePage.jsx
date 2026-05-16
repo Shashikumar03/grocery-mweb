@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 import { Screen } from "../../components/common/Screen.jsx";
+import { HomeIplEntry } from "../../components/home/HomeIplEntry.jsx";
+import { HomeLottieBanners } from "../../components/home/HomeLottieBanners.jsx";
+import { HomeThandaSection } from "../../components/home/HomeThandaSection.jsx";
 import { readAuthSession } from "../../utils/authSession.js";
 
 function getGreeting() {
@@ -36,14 +39,32 @@ export function HomePage() {
         </p>
       </header>
 
-      <section className="home-promo" aria-labelledby="home-promo-heading">
-        <h2 id="home-promo-heading" className="home-promo__title">
-          Today at a glance
+      <HomeLottieBanners />
+
+      <HomeIplEntry />
+
+      <section className="home-offers" aria-labelledby="home-offers-heading">
+        <h2 id="home-offers-heading" className="sr-only">
+          Our offers
         </h2>
-        <p className="home-promo__text">
-          Browse categories for seasonal picks, or jump straight to search when you know exactly what
-          you need.
-        </p>
+        <ul className="home-offers__list">
+          <li className="home-offers__card">
+            <p className="home-offers__en">
+              Get <strong>Thanda</strong> without any fridge charges
+            </p>
+            <p className="home-offers__hi" lang="hi">
+              बिना किसी फ्रिज चार्ज के <strong>ठंडा</strong> पाएं
+            </p>
+          </li>
+          <li className="home-offers__card home-offers__card--delivery">
+            <p className="home-offers__en">
+              Get <strong>delivery at your home</strong> without any extra charges
+            </p>
+            <p className="home-offers__hi" lang="hi">
+              <strong>घर पर डिलीवरी</strong> पाएं, बिना किसी अतिरिक्त शुल्क के
+            </p>
+          </li>
+        </ul>
       </section>
 
       <section className="home-actions" aria-label="Quick shortcuts">
@@ -96,12 +117,14 @@ export function HomePage() {
         </ul>
       </section>
 
+      <HomeThandaSection />
+
       <p className="home-foot muted">
-        Tip: add favourites to your cart from{" "}
-        <Link to="/categories" className="cart-inline-link">
-          categories
-        </Link>{" "}
-        — then choose payment and delivery on the cart page.
+        Add drinks from above, then checkout from{" "}
+        <Link to="/cart" className="cart-inline-link">
+          your cart
+        </Link>
+        .
       </p>
     </Screen>
   );

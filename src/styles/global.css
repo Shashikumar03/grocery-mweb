@@ -321,6 +321,801 @@ a:hover {
   text-align: center;
 }
 
+.home-offers {
+  margin: 0 0 20px;
+}
+
+.home-offers__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.home-offers__card {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  border: 1px solid rgb(13 148 136 / 0.2);
+  box-shadow: var(--shadow);
+}
+
+.home-offers__card--delivery {
+  border-color: rgb(14 165 233 / 0.28);
+  background: linear-gradient(
+    135deg,
+    rgb(14 165 233 / 0.08) 0%,
+    var(--color-surface) 100%
+  );
+}
+
+.home-offers__en,
+.home-offers__hi {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.home-offers__en {
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.home-offers__hi {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+/* —— Home IPL entry —— */
+.home-ipl-entry {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  margin: 0 0 20px;
+  padding: 14px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 16px;
+  background: linear-gradient(
+    125deg,
+    #1e3a8a 0%,
+    #7c3aed 45%,
+    #ea580c 100%
+  );
+  box-shadow: 0 10px 32px rgb(30 58 138 / 0.25);
+  overflow: hidden;
+}
+
+.home-ipl-entry:hover {
+  text-decoration: none;
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.home-ipl-entry__visual {
+  flex: 0 0 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-ipl-entry__lottie,
+.home-ipl-entry__skel {
+  width: 88px;
+  height: 88px;
+}
+
+.home-ipl-entry__skel {
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.15);
+}
+
+.home-ipl-entry__emoji {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.home-ipl-entry__body {
+  flex: 1;
+  min-width: 0;
+  color: #fff;
+}
+
+.home-ipl-entry__badge {
+  margin: 0 0 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.home-ipl-entry__title {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.home-ipl-entry__desc,
+.home-ipl-entry__desc-hi {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  opacity: 0.95;
+}
+
+.home-ipl-entry__desc-hi {
+  margin-bottom: 8px;
+  opacity: 0.85;
+}
+
+.home-ipl-entry__cta {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* —— IPL predict page —— */
+.ipl-back {
+  margin: 0 0 12px;
+  font-size: 0.875rem;
+}
+
+.ipl-hero {
+  margin: 0 0 16px;
+  padding: 18px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 55%, #ea580c 100%);
+  color: #fff;
+}
+
+.ipl-hero__badge {
+  margin: 0 0 8px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.ipl-hero__title {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.ipl-hero__lead,
+.ipl-hero__lead-hi {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  opacity: 0.95;
+}
+
+.ipl-hero__lead-hi {
+  margin-top: 8px;
+  opacity: 0.85;
+}
+
+.ipl-wallet {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid rgb(13 148 136 / 0.2);
+}
+
+.ipl-wallet__row {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 4px 0;
+  font-size: 0.9rem;
+}
+
+.ipl-wallet__row strong {
+  font-size: 1.15rem;
+  color: var(--color-accent);
+}
+
+.ipl-signin {
+  margin: 0 0 16px;
+  font-size: 0.875rem;
+}
+
+.ipl-section {
+  margin: 0 0 20px;
+}
+
+.ipl-section__title {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.ipl-match-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ipl-match {
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid rgb(15 23 42 / 0.08);
+}
+
+.ipl-match--completed {
+  border-color: rgb(15 23 42 / 0.06);
+  opacity: 0.95;
+}
+
+.ipl-match__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+}
+
+.ipl-match__when {
+  font-weight: 700;
+}
+
+.ipl-match__teams {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.ipl-match__team {
+  color: var(--color-text);
+}
+
+.ipl-match__vs {
+  margin: 0 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.ipl-match__reward {
+  margin: 0 0 12px;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.ipl-match__pick {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ipl-match__btn {
+  padding: 12px 8px;
+  border: 2px solid rgb(15 23 42 / 0.12);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  background: var(--color-bg);
+  cursor: pointer;
+}
+
+.ipl-match__btn--picked {
+  border-color: #7c3aed;
+  background: rgb(124 58 237 / 0.12);
+  color: #5b21b6;
+}
+
+.ipl-match__status,
+.ipl-match__result {
+  margin: 10px 0 0;
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.ipl-match__result--won {
+  padding: 8px;
+  border-radius: 8px;
+  background: rgb(13 148 136 / 0.1);
+  color: #0f766e;
+  font-weight: 600;
+}
+
+.ipl-rules {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.home-banners {
+  margin: 0 0 20px;
+}
+
+.home-banners__track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.home-banner {
+  flex: 0 0 min(78%, 280px);
+  scroll-snap-align: start;
+  position: relative;
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(145deg, #0ea5e9 0%, #0d9488 100%);
+  box-shadow: var(--shadow);
+  min-height: 140px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.home-banner--drinks {
+  background: linear-gradient(135deg, #0284c7 0%, #0d9488 45%, #06b6d4 100%);
+}
+
+.home-banner--drinks:hover {
+  text-decoration: none;
+  filter: brightness(1.04);
+}
+
+.home-banner--delivery {
+  background: linear-gradient(145deg, #0d9488 0%, #14b8a6 100%);
+}
+
+.home-banner__drinks-art {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  pointer-events: none;
+}
+
+.home-banner__drinks-bottle {
+  width: 72px;
+  height: 108px;
+  opacity: 0.45;
+}
+
+.home-banner__drinks-emoji {
+  position: absolute;
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.2));
+}
+
+.home-banner__drinks-emoji--1 {
+  top: 18px;
+  right: 24px;
+}
+
+.home-banner__drinks-emoji--2 {
+  bottom: 36px;
+  left: 20px;
+  font-size: 1.65rem;
+}
+
+.home-banner__drinks-emoji--3 {
+  top: 28px;
+  left: 28%;
+  font-size: 1.5rem;
+}
+
+.home-banner__drinks-badge {
+  position: absolute;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 900;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
+}
+
+.home-banner__drinks-badge--cola {
+  bottom: 40px;
+  right: 18%;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.home-banner__drinks-badge--lime {
+  bottom: 52px;
+  right: 8%;
+  background: #f0fdf4;
+  color: #16a34a;
+  font-size: 0.85rem;
+}
+
+.home-banner__lottie--overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 140px;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.home-banner__text {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.home-banner__text .home-banner__label {
+  position: static;
+  display: inline-block;
+  width: fit-content;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+  background: rgb(15 23 42 / 0.5);
+  border-radius: 999px;
+}
+
+.home-banner__sublabel {
+  display: inline-block;
+  width: fit-content;
+  padding: 3px 8px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgb(15 23 42 / 0.4);
+  border-radius: 999px;
+}
+
+.home-banner__fallback--delivery {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-banner__delivery-emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.home-banner__lottie,
+.home-banner__skel,
+.home-banner__fallback {
+  width: 100%;
+  height: 140px;
+  display: block;
+}
+
+.home-banner__skel {
+  background: rgb(255 255 255 / 0.15);
+  animation: home-banner-pulse 1.2s ease-in-out infinite;
+}
+
+.home-banner__fallback {
+  background: rgb(255 255 255 / 0.12);
+}
+
+@keyframes home-banner-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.home-banner__label {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgb(15 23 42 / 0.45);
+  border-radius: 999px;
+}
+
+.home-thanda {
+  margin: 0 0 20px;
+  padding: 18px 16px 16px;
+  border-radius: 16px;
+  background: linear-gradient(
+    160deg,
+    rgb(14 165 233 / 0.12) 0%,
+    rgb(13 148 136 / 0.08) 50%,
+    var(--color-surface) 100%
+  );
+  border: 1px solid rgb(14 165 233 / 0.22);
+  box-shadow: var(--shadow);
+}
+
+.home-thanda__promo {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.home-thanda__visual {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 12px;
+}
+
+.home-thanda__lottie {
+  width: 120px;
+  height: 120px;
+}
+
+.home-thanda__visual-fallback {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #0ea5e9 0%, #0284c7 50%, #0d9488 100%);
+  color: #fff;
+}
+
+.home-thanda__bottle {
+  width: 56px;
+  height: 84px;
+  color: #fff;
+  opacity: 0.9;
+}
+
+.home-thanda__emoji {
+  position: absolute;
+  font-size: 1.75rem;
+  line-height: 1;
+  right: 8px;
+  top: 8px;
+}
+
+.home-thanda__emoji--2 {
+  right: auto;
+  left: 8px;
+  bottom: 8px;
+  top: auto;
+  font-size: 1.35rem;
+}
+
+.home-thanda__title {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-thanda__hindi {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0284c7;
+}
+
+.home-thanda__tagline,
+.home-thanda__tagline-hi {
+  margin: 0 0 6px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--color-text);
+}
+
+.home-thanda__tagline-hi {
+  color: var(--color-muted);
+}
+
+.home-thanda__tagline--delivery {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed rgb(14 165 233 / 0.35);
+}
+
+.home-thanda__aisle {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.home-thanda__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.beverage-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  border: 1px solid rgb(15 23 42 / 0.08);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.beverage-card__link {
+  display: block;
+  padding: 10px 10px 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.beverage-card__link:hover {
+  text-decoration: none;
+}
+
+.beverage-card__media {
+  margin-bottom: 8px;
+}
+
+.beverage-card__img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.beverage-card__visual {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #fff;
+}
+
+.beverage-card__visual--cola {
+  background: linear-gradient(160deg, #dc2626 0%, #991b1b 100%);
+}
+
+.beverage-card__visual--lime {
+  background: linear-gradient(160deg, #22c55e 0%, #15803d 100%);
+}
+
+.beverage-card__visual--juice {
+  background: linear-gradient(160deg, #f97316 0%, #c2410c 100%);
+}
+
+.beverage-card__visual--water {
+  background: linear-gradient(160deg, #38bdf8 0%, #0369a1 100%);
+}
+
+.beverage-card__visual--dairy {
+  background: linear-gradient(160deg, #fbbf24 0%, #d97706 100%);
+}
+
+.beverage-card__visual--energy {
+  background: linear-gradient(160deg, #a855f7 0%, #6b21a8 100%);
+}
+
+.beverage-card__visual--beer {
+  background: linear-gradient(160deg, #eab308 0%, #a16207 100%);
+}
+
+.beverage-card__visual--cold {
+  background: linear-gradient(160deg, #0ea5e9 0%, #0d9488 100%);
+}
+
+.beverage-card__bottle {
+  width: 48%;
+  height: auto;
+  max-height: 72%;
+  color: inherit;
+  opacity: 0.35;
+}
+
+.beverage-card__emoji {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 1.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.2));
+}
+
+.beverage-card__logo {
+  position: relative;
+  z-index: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 900;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.92);
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgb(15 23 42 / 0.15);
+}
+
+.beverage-card__type {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.25);
+}
+
+.beverage-card__name {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.beverage-card__price {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.beverage-card__add {
+  margin: 0 10px 10px;
+  padding: 10px 8px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-accent-contrast);
+  background: var(--color-accent);
+  cursor: pointer;
+}
+
+.beverage-card__add:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .muted {
   color: var(--color-muted);
   margin: 0;

@@ -12,6 +12,7 @@ import { AddressesPage } from "../pages/account/AddressesPage.jsx";
 import { SignUpPage } from "../pages/auth/SignUpPage.jsx";
 import { LoginPage } from "../pages/auth/LoginPage.jsx";
 import { NotFoundPage } from "../pages/errors/NotFoundPage.jsx";
+import { IplPredictPage } from "../pages/ipl/IplPredictPage.jsx";
 
 export const routes = [
   { path: "/", element: <HomePage /> },
@@ -22,6 +23,7 @@ export const routes = [
   { path: "/cart", element: <CartPage /> },
   { path: "/checkout", element: <CheckoutPage /> },
   { path: "/orders", element: <OrdersPage /> },
+  { path: "/ipl", element: <IplPredictPage /> },
   { path: "/account", element: <AccountPage /> },
   { path: "/account/addresses", element: <AddressesPage /> },
   { path: "/signup", element: <SignUpPage /> },

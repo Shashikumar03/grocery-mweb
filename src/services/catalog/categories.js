@@ -48,3 +48,48 @@ export async function fetchAllCategories() {
     .filter((row) => row && typeof row === "object" && !Array.isArray(row))
     .map((row) => normalizeCategoryRow(/** @type {Record<string, unknown>} */ (row)));
 }
+
+/**
+ * @param {unknown} parsed
+ * @returns {Record<string, unknown> | null}
+ */
+export function normalizeCategoryDetail(parsed) {
+  if (!parsed || typeof parsed !== "object") return null;
+  if (Array.isArray(parsed)) {
+    const first = parsed[0];
+    return first && typeof first === "object" && !Array.isArray(first)
+      ? normalizeCategoryRow(/** @type {Record<string, unknown>} */ (first))
+      : null;
+  }
+  const o = /** @type {Record<string, unknown>} */ (parsed);
+  const inner = o.data ?? o.category ?? o.body;
+  if (inner && typeof inner === "object" && !Array.isArray(inner)) {
+    return normalizeCategoryRow(/** @type {Record<string, unknown>} */ (inner));
+  }
+  return normalizeCategoryRow(o);
+}
+
+/** @param {Record<string, unknown> | null} category */
+export function getProductsFromCategory(category) {
+  if (!category) return [];
+  const raw =
+    category.productsDto ?? category.products ?? category.productDtos ?? [];
+  return Array.isArray(raw)
+    ? raw.filter((p) => p && typeof p === "object" && !Array.isArray(p))
+    : [];
+}
+
+/**
+ * GET /api/category/{categoryId} — e.g. beverages at id 5.
+ * @param {number | string} categoryId
+ * @returns {Promise<Record<string, unknown> | null>}
+ */
+export async function fetchCategoryById(categoryId) {
+  const res = await fetch(
+    apiUrl(`/api/category/${encodeURIComponent(String(categoryId))}`)
+  );
+  const raw = await res.text();
+  const parsed = parseJsonResponseText(raw);
+  throwIfApiFailure(res, parsed);
+  return normalizeCategoryDetail(parsed);
+}
