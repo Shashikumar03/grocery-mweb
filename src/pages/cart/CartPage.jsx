@@ -30,7 +30,7 @@ import {
 } from "../../utils/placeOrderResponse.js";
 
 const PAYMENT_MODE = "ONLINE";
-const PAYMENT_LABEL = "Pay online (Razorpay)";
+const PAYMENT_LABEL = "Pay";
 
 const DELIVERY_ETA_MINUTES = 20;
 
@@ -414,7 +414,7 @@ export function CartPage() {
                 Payment
               </h2>
               <p className="muted cart-pay__intro">
-                Pay securely with Razorpay — UPI, debit/credit card, or net banking.
+                UPI, debit/credit card, or net banking.
               </p>
               {orderError ? (
                 <p className="form-error" role="alert">
@@ -432,7 +432,7 @@ export function CartPage() {
                 }
                 onClick={() => void handlePlaceOrder()}
               >
-                {orderSubmitting ? "Processing…" : "Pay with Razorpay"}
+                {orderSubmitting ? "Processing…" : "Pay"}
               </button>
               <p className="muted cart-pay__note">
                 Payment is collected online before your order is confirmed.
