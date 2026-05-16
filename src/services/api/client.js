@@ -1,4 +1,4 @@
-import { DEFAULT_API_BASE_URL } from "../../constants/config.js";
+import { clearAuthSession } from "../../utils/authSession.js";
 
 function stripTrailingSlash(url) {
   return url.replace(/\/+$/, "");
@@ -6,17 +6,32 @@ function stripTrailingSlash(url) {
 
 /**
  * Backend origin for API calls.
- * - Set `VITE_API_BASE_URL` to a full URL to call the API directly (server must send CORS headers).
- * - Set `VITE_API_BASE_URL` to empty in `.env.production` / `.env` so requests stay same-origin; Vite
- *   `server` / `preview` proxy forwards `/api` and `/auth` to the backend (see `vite.config.js`).
+ * - Unset or empty `VITE_API_BASE_URL`: same-origin `/api` and `/auth` (Vite dev, Netlify redirects).
+ * - Set to a full URL only when the API sends CORS for your site origin.
  */
 export function getApiBase() {
   const fromEnv = import.meta.env.VITE_API_BASE_URL;
-  if (fromEnv !== undefined && fromEnv !== null) {
-    const trimmed = String(fromEnv).trim();
-    return trimmed ? stripTrailingSlash(trimmed) : "";
+  if (fromEnv === undefined || fromEnv === null) {
+    return "";
   }
-  return stripTrailingSlash(DEFAULT_API_BASE_URL);
+  const trimmed = String(fromEnv).trim();
+  if (!trimmed) return "";
+
+  const base = stripTrailingSlash(trimmed);
+  if (typeof window === "undefined") return base;
+
+  try {
+    const apiOrigin = new URL(base).origin;
+    if (apiOrigin !== window.location.origin) {
+      console.warn(
+        "[api] VITE_API_BASE_URL is cross-origin; using same-origin /api proxy instead."
+      );
+      return "";
+    }
+  } catch {
+    return base;
+  }
+  return base;
 }
 
 /** Build an absolute API URL from a path like `/health` or `health`. */
@@ -126,6 +141,9 @@ function formatApiErrorMessage(parsed, status) {
   if (flatMsg) return flatMsg;
 
   if (typeof parsed === "string" && parsed) return parsed;
+  if (status === 401) {
+    return "Session expired or not signed in on this site. Please log in again.";
+  }
   return `Request failed (${status})`;
 }
 
@@ -143,6 +161,9 @@ function isApiFailureEnvelope(parsed) {
  */
 export function throwIfApiFailure(res, parsed) {
   if (!res.ok) {
+    if (res.status === 401) {
+      clearAuthSession();
+    }
     throw new Error(formatApiErrorMessage(parsed, res.status));
   }
   if (isApiFailureEnvelope(parsed)) {

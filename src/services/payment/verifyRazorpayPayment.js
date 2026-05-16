@@ -45,7 +45,7 @@ export async function verifyRazorpayPayment(payload) {
       });
       const raw = await res.text();
       const parsed = raw ? parseJsonResponseText(raw) : null;
-      if (res.status === 404) continue;
+      if (res.status === 404 || res.status === 401) continue;
       throwIfApiFailure(res, parsed);
       return parsed;
     } catch (err) {

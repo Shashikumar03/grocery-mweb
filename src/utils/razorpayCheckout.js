@@ -1,6 +1,7 @@
 import { APP_NAME } from "../constants/config.js";
 import { getRazorpayKeyId } from "../constants/razorpay.js";
 import { loadRazorpayScript } from "./loadRazorpayScript.js";
+import { isLocalDevHost } from "./isLocalDevHost.js";
 
 /** Razorpay Orders API ids look like `order_9A33XWu170gUtm`. */
 export function isValidRazorpayOrderId(orderId) {
@@ -48,12 +49,9 @@ export async function openRazorpayCheckout(input) {
       `Invalid Razorpay order id from server ("${orderId}"). Expected format order_xxxx.`
     );
   }
-  if (!input.amountPaise || input.amountPaise < 100) {
-    throw new Error("Invalid payment amount (minimum ₹1).");
-  }
-  if (key.startsWith("rzp_live_") && typeof window !== "undefined" && window.location.protocol === "http:") {
+  if (key.startsWith("rzp_live_") && isLocalDevHost()) {
     throw new Error(
-      "Live Razorpay keys require HTTPS. Use test keys (rzp_test_...) on local/preview, or deploy to Netlify."
+      "Live Razorpay keys do not work on localhost or LAN preview. Use rzp_test_... locally, or open your Netlify HTTPS site for live payments."
     );
   }
 
@@ -68,7 +66,6 @@ export async function openRazorpayCheckout(input) {
     /** @type {Record<string, unknown>} */
     const options = {
       key,
-      amount: input.amountPaise,
       currency: input.currency ?? "INR",
       name: input.name ?? APP_NAME,
       description: input.description ?? "Grocery order",
@@ -77,6 +74,7 @@ export async function openRazorpayCheckout(input) {
       notes: input.notes ?? {},
       theme: { color: "#0d9488" },
     };
+    // Amount must match the Razorpay order created on the server — do not override here.
     options.handler = (response) => {
       resolve({
         razorpay_payment_id: response.razorpay_payment_id,
