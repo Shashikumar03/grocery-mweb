@@ -5,7 +5,7 @@ import { CartPageShimmer } from "../../components/common/Shimmer.jsx";
 import { CartLineItem } from "../../components/cart/CartLineItem.jsx";
 import { OrderTrackingOverlay } from "../../components/cart/OrderTrackingOverlay.jsx";
 import { fetchDeliveryAddresses, getDeliveryAddressId } from "../../services/address/index.js";
-import { fetchCart } from "../../services/cart/index.js";
+import { fetchCart, updateCartItemQuantity } from "../../services/cart/index.js";
 import { placeOrder } from "../../services/order/index.js";
 import { useCartCount } from "../../context/CartCountContext.jsx";
 import { formatCurrency } from "../../utils/format.js";
@@ -75,6 +75,8 @@ export function CartPage() {
   const [orderSubmitting, setOrderSubmitting] = useState(false);
   const [orderError, setOrderError] = useState("");
   const [trackingDetails, setTrackingDetails] = useState(null);
+  const [qtyUpdatingId, setQtyUpdatingId] = useState(null);
+  const [qtyError, setQtyError] = useState("");
 
   const loadCart = useCallback(async () => {
     if (userId == null) {
@@ -267,6 +269,54 @@ export function CartPage() {
     navigate("/", { replace: true });
   }, [navigate]);
 
+  const applyCartResponse = useCallback(
+    (data) => {
+      if (data && typeof data === "object" && !Array.isArray(data)) {
+        const o = /** @type {Record<string, unknown>} */ (data);
+        if (Array.isArray(o.cartItemsDto)) {
+          setCart(data);
+          syncCartFromResponse(data);
+          return;
+        }
+        if (o.cartDto && typeof o.cartDto === "object" && !Array.isArray(o.cartDto)) {
+          setCart(o.cartDto);
+          syncCartFromResponse(o.cartDto);
+          return;
+        }
+      }
+    },
+    [syncCartFromResponse]
+  );
+
+  const handleCartItemQuantity = useCallback(
+    async (cartItemId, action) => {
+      if (userId == null || cartItemId == null) return;
+      setQtyError("");
+      setQtyUpdatingId(cartItemId);
+      try {
+        const parsed = await updateCartItemQuantity(cartItemId, action);
+        applyCartResponse(parsed);
+        try {
+          const data = await fetchCart(userId, { clearSessionOn401: false });
+          setCart(data);
+          syncCartFromResponse(data);
+        } catch {
+          /* keep optimistic response if refresh fails */
+        }
+      } catch (err) {
+        setQtyError(getReadableFetchError(err));
+        try {
+          await loadCart();
+        } catch {
+          /* ignore */
+        }
+      } finally {
+        setQtyUpdatingId(null);
+      }
+    },
+    [userId, applyCartResponse, syncCartFromResponse, loadCart]
+  );
+
   const items = Array.isArray(cart?.cartItemsDto) ? cart.cartItemsDto : [];
   const total =
     cart?.cartTotalPrice != null ? Number(cart.cartTotalPrice) : null;
@@ -326,9 +376,29 @@ export function CartPage() {
           {items.length === 0 ? (
             <p className="muted">Your cart is empty.</p>
           ) : (
-            <div className="cart-lines">{items.map((it) => (
-              <CartLineItem key={it.cartItemId ?? it.productId} item={it} />
-            ))}</div>
+            <>
+              {qtyError ? (
+                <p className="form-error" role="alert">
+                  {qtyError}
+                </p>
+              ) : null}
+              <div className="cart-lines">
+                {items.map((it) => {
+                  const lineId = it.cartItemId ?? it.productId;
+                  return (
+                    <CartLineItem
+                      key={lineId}
+                      item={it}
+                      quantityUpdating={qtyUpdatingId === lineId}
+                      onQuantityChange={(action) => {
+                        if (it.cartItemId == null) return;
+                        void handleCartItemQuantity(it.cartItemId, action);
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </>
           )}
 
           {items.length > 0 ? (

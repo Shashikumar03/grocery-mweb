@@ -1372,6 +1372,36 @@ a:hover {
   font-size: 0.78rem;
 }
 
+.cart-line__qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cart-line__qty-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgb(15 23 42 / 0.12);
+  background: var(--color-bg);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cart-line__qty-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.cart-line__qty-value {
+  min-width: 1.5ch;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 .cart-line__total {
   margin: 0;
   font-weight: 700;
