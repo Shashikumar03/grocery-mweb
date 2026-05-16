@@ -147,8 +147,6 @@ export function OrdersPage() {
                 const amount = getPaymentAmount(o);
                 const addr = formatAddressSnippet(o);
                 const paymentStatus = getPaymentStatus(o);
-                const paymentStatusLabel = formatPaymentStatusLabel(paymentStatus);
-                const paymentStatusTone = getPaymentStatusTone(paymentStatus);
                 return (
                   <li key={key} className="order-history__card">
                     <div className="order-history__head">
