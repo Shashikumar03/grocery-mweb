@@ -31,6 +31,17 @@ function getPaymentMode(o) {
 }
 
 /** @param {Record<string, unknown>} o */
+function getPaymentStatus(o) {
+  const p = o.payment;
+  const nested =
+    p && typeof p === "object" && !Array.isArray(p)
+      ? /** @type {Record<string, unknown>} */ (p).paymentStatus
+      : null;
+  const s = o.paymentStatus ?? nested;
+  return s != null ? String(s).trim() : "";
+}
+
+/** @param {Record<string, unknown>} o */
 function getPaymentAmount(o) {
   const p = o.payment;
   if (p && typeof p === "object" && !Array.isArray(p)) {
@@ -135,6 +146,9 @@ export function OrdersPage() {
                 const key = orderId != null ? `order-${orderId}` : `order-idx-${idx}`;
                 const amount = getPaymentAmount(o);
                 const addr = formatAddressSnippet(o);
+                const paymentStatus = getPaymentStatus(o);
+                const paymentStatusLabel = formatPaymentStatusLabel(paymentStatus);
+                const paymentStatusTone = getPaymentStatusTone(paymentStatus);
                 return (
                   <li key={key} className="order-history__card">
                     <div className="order-history__head">
@@ -149,6 +163,10 @@ export function OrdersPage() {
                       <div className="order-history__row">
                         <dt>Payment</dt>
                         <dd>{getPaymentMode(o)}</dd>
+                      </div>
+                      <div className="order-history__row">
+                        <dt>Payment status</dt>
+                        <dd>{paymentStatus || "—"}</dd>
                       </div>
                       {amount != null ? (
                         <div className="order-history__row">

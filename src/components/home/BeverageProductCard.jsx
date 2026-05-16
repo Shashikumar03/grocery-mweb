@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { AddedToCartCta } from "../cart/AddedToCartCta.jsx";
 import { formatCurrency } from "../../utils/format.js";
 import { BeverageProductMedia } from "./BeverageProductMedia.jsx";
 
@@ -8,19 +7,9 @@ import { BeverageProductMedia } from "./BeverageProductMedia.jsx";
  *   product: Record<string, unknown>;
  *   onAddToCart: (product: Record<string, unknown>) => void;
  *   adding: boolean;
- *   justAdded?: boolean;
- *   cartItemCount?: number;
- *   onDismissCartCta?: () => void;
  * }} props
  */
-export function BeverageProductCard({
-  product,
-  onAddToCart,
-  adding,
-  justAdded = false,
-  cartItemCount = 0,
-  onDismissCartCta,
-}) {
+export function BeverageProductCard({ product, onAddToCart, adding }) {
   const price = formatCurrency(Number(product.price) || 0, "INR");
   const available = Boolean(product.available);
   const id = product.id ?? product.productId;
@@ -41,13 +30,6 @@ export function BeverageProductCard({
       >
         {adding ? "Adding…" : available ? "Add to cart" : "Unavailable"}
       </button>
-      {justAdded ? (
-        <AddedToCartCta
-          compact
-          itemCount={cartItemCount}
-          onDismiss={onDismissCartCta}
-        />
-      ) : null}
     </article>
   );
 }

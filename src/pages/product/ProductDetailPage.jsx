@@ -190,14 +190,15 @@ export function ProductDetailPage() {
             {cartSubmitting ? "Adding…" : available ? "Add to cart" : "Out of stock"}
           </button>
 
-          {cartMessage ? (
-            <AddedToCartCta
-              itemCount={itemCount}
-              onDismiss={() => setCartMessage("")}
-            />
-          ) : null}
         </>
       ) : null}
+
+      <AddedToCartCta
+        open={Boolean(cartMessage)}
+        onClose={() => setCartMessage("")}
+        itemCount={itemCount}
+      />
+
       <AuthPromptModal
         open={authModalOpen}
         onClose={() => setAuthModalOpen(false)}

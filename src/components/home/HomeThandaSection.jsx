@@ -6,6 +6,7 @@ import {
   fetchCategoryById,
   getProductsFromCategory,
 } from "../../services/catalog/index.js";
+import { AddedToCartCta } from "../cart/AddedToCartCta.jsx";
 import { addProductToCart } from "../../services/cart/index.js";
 import { useCartCount } from "../../context/CartCountContext.jsx";
 import { getReadableFetchError } from "../../utils/fetchError.js";
@@ -131,14 +132,17 @@ export function HomeThandaSection() {
                 product={p}
                 onAddToCart={handleAddToCart}
                 adding={addingId === pid}
-                justAdded={lastAddedId === pid}
-                cartItemCount={itemCount}
-                onDismissCartCta={() => setLastAddedId(null)}
               />
             );
           })}
         </div>
       ) : null}
+
+      <AddedToCartCta
+        open={lastAddedId != null}
+        onClose={() => setLastAddedId(null)}
+        itemCount={itemCount}
+      />
 
       <AuthPromptModal
         open={authOpen}
