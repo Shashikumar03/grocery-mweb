@@ -10,7 +10,7 @@ import { placeOrder } from "../../services/order/index.js";
 import { useCartCount } from "../../context/CartCountContext.jsx";
 import { formatCurrency } from "../../utils/format.js";
 import { getReadableFetchError } from "../../utils/fetchError.js";
-import { verifyRazorpayPayment } from "../../services/payment/index.js";
+import { updatePayment, verifyRazorpayPayment } from "../../services/payment/index.js";
 import { getRazorpayKeyId } from "../../constants/razorpay.js";
 import {
   getAuthToken,
@@ -24,26 +24,12 @@ import {
   formatAddressFromOrderResponse,
   formatAddressOneLine,
   inrToPaise,
-  isOnlinePaymentMode,
   pickFromOrderResponse,
   pickRazorpayFromOrderResponse,
 } from "../../utils/placeOrderResponse.js";
 
-/** `paymentMode` query for POST /api/place-order/{userId}/{addressId}?paymentMode=… */
-const PAYMENT_OPTIONS = [
-  {
-    id: "cod",
-    paymentMode: "CASH_ON_DELIVERY",
-    label: "Cash on delivery",
-    hint: "Pay when you receive",
-  },
-  {
-    id: "online",
-    paymentMode: "ONLINE",
-    label: "Pay online",
-    hint: "UPI, card, or net banking via Razorpay",
-  },
-];
+const PAYMENT_MODE = "ONLINE";
+const PAYMENT_LABEL = "Pay online (Razorpay)";
 
 const DELIVERY_ETA_MINUTES = 20;
 
@@ -84,8 +70,6 @@ export function CartPage() {
   const [addressesLoading, setAddressesLoading] = useState(false);
   const [addressesError, setAddressesError] = useState("");
   const [selectedAddressId, setSelectedAddressId] = useState(null);
-
-  const [payment, setPayment] = useState("cod");
 
   const [orderSubmitting, setOrderSubmitting] = useState(false);
   const [orderError, setOrderError] = useState("");
@@ -161,11 +145,9 @@ export function CartPage() {
       setOrderError("Choose a delivery address.");
       return;
     }
-    const opt = PAYMENT_OPTIONS.find((o) => o.id === payment);
-    const paymentMode = opt?.paymentMode ?? "CASH_ON_DELIVERY";
     const addressRow = addresses.find((r) => getDeliveryAddressId(r) === selectedAddressId);
     const addressLine = addressRow ? formatAddressOneLine(addressRow) : "";
-    const paymentLabel = opt?.label ?? "";
+    const paymentLabel = PAYMENT_LABEL;
     const itemsCopy = Array.isArray(cart?.cartItemsDto)
       ? cart.cartItemsDto.map((row) => ({ ...row }))
       : [];
@@ -176,60 +158,64 @@ export function CartPage() {
 
     setOrderSubmitting(true);
     try {
-      const parsed = await placeOrder(userId, selectedAddressId, paymentMode);
+      const parsed = await placeOrder(userId, selectedAddressId, PAYMENT_MODE);
       const fromApi = pickFromOrderResponse(parsed);
 
-      if (isOnlinePaymentMode(paymentMode)) {
-        const { razorpayOrderId, amountInr } = pickRazorpayFromOrderResponse(parsed);
-        const amountPaise = inrToPaise(
-          amountInr ?? (total != null && Number.isFinite(total) ? total : 0)
+      const { razorpayOrderId, amountInr } = pickRazorpayFromOrderResponse(parsed);
+      const amountPaise = inrToPaise(
+        amountInr ?? (total != null && Number.isFinite(total) ? total : 0)
+      );
+
+      if (!getRazorpayKeyId()) {
+        throw new Error(
+          "Online payment is not configured. Add VITE_RAZORPAY_KEY_ID to your environment."
         );
+      }
+      if (!razorpayOrderId) {
+        throw new Error(
+          "Could not start payment. The server did not return a Razorpay order id."
+        );
+      }
 
-        if (!getRazorpayKeyId()) {
-          throw new Error(
-            "Online payment is not configured. Use cash on delivery or add VITE_RAZORPAY_KEY_ID."
-          );
-        }
-        if (!razorpayOrderId) {
-          throw new Error(
-            "Could not start payment. The server did not return a Razorpay order id."
-          );
-        }
+      const session = readAuthSession();
+      const user = session?.user && typeof session.user === "object" ? session.user : null;
+      const userName = user?.name != null ? String(user.name) : "";
+      const userEmail = user?.email ?? user?.username;
+      const userPhone = user?.phoneNumber;
 
-        const session = readAuthSession();
-        const user = session?.user && typeof session.user === "object" ? session.user : null;
-        const userName = user?.name != null ? String(user.name) : "";
-        const userEmail = user?.email ?? user?.username;
-        const userPhone = user?.phoneNumber;
+      setOrderSubmitting(false);
 
-        setOrderSubmitting(false);
+      const razorpayResult = await openRazorpayCheckout({
+        razorpayOrderId,
+        amountPaise,
+        description: `Order #${fromApi.orderId ?? ""}`.trim(),
+        prefill: {
+          name: userName || undefined,
+          email: userEmail != null ? String(userEmail) : undefined,
+          contact: userPhone != null ? String(userPhone).replace(/\D/g, "") : undefined,
+        },
+        notes: fromApi.orderId != null ? { orderId: String(fromApi.orderId) } : {},
+      });
 
-        const razorpayResult = await openRazorpayCheckout({
-          razorpayOrderId,
-          amountPaise,
-          description: `Order #${fromApi.orderId ?? ""}`.trim(),
-          prefill: {
-            name: userName || undefined,
-            email: userEmail != null ? String(userEmail) : undefined,
-            contact: userPhone != null ? String(userPhone).replace(/\D/g, "") : undefined,
-          },
-          notes: fromApi.orderId != null ? { orderId: String(fromApi.orderId) } : {},
-        });
-
-        setOrderSubmitting(true);
+      setOrderSubmitting(true);
+      try {
+        await updatePayment(
+          razorpayResult.razorpay_order_id,
+          "COMPLETED",
+          razorpayResult.razorpay_payment_id
+        );
+      } catch {
         try {
           await verifyRazorpayPayment({
             ...razorpayResult,
             orderId: fromApi.orderId ?? undefined,
           });
         } catch {
-          /* verify endpoint optional — Razorpay success is enough for UX */
+          /* Razorpay paid; webhook at /api/webhook may still update backend */
         }
-
-        setTrackingDetails(buildTrackingFromOrder(parsed, extras));
-      } else {
-        setTrackingDetails(buildTrackingFromOrder(parsed, extras));
       }
+
+      setTrackingDetails(buildTrackingFromOrder(parsed, extras));
 
       try {
         await loadCart();
@@ -247,7 +233,6 @@ export function CartPage() {
     userId,
     token,
     selectedAddressId,
-    payment,
     cart,
     addresses,
     loadCart,
@@ -407,30 +392,8 @@ export function CartPage() {
                 Payment
               </h2>
               <p className="muted cart-pay__intro">
-                Cash on delivery places the order directly. Pay online opens secure Razorpay
-                checkout (UPI, card, net banking).
+                Pay securely with Razorpay — UPI, debit/credit card, or net banking.
               </p>
-              <ul className="cart-pay__list" role="radiogroup" aria-label="Payment method">
-                {PAYMENT_OPTIONS.map((opt) => (
-                  <li key={opt.id}>
-                    <label
-                      className={`cart-pay__option${payment === opt.id ? " cart-pay__option--selected" : ""}`}
-                    >
-                      <input
-                        type="radio"
-                        name="payment"
-                        value={opt.id}
-                        checked={payment === opt.id}
-                        onChange={() => setPayment(opt.id)}
-                      />
-                      <span className="cart-pay__option-body">
-                        <span className="cart-pay__option-label">{opt.label}</span>
-                        <span className="cart-pay__option-hint muted">{opt.hint}</span>
-                      </span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
               {orderError ? (
                 <p className="form-error" role="alert">
                   {orderError}
@@ -447,18 +410,10 @@ export function CartPage() {
                 }
                 onClick={() => void handlePlaceOrder()}
               >
-                {orderSubmitting
-                  ? payment === "cod"
-                    ? "Placing order…"
-                    : "Processing…"
-                  : payment === "cod"
-                    ? "Place order"
-                    : "Pay with Razorpay"}
+                {orderSubmitting ? "Processing…" : "Pay with Razorpay"}
               </button>
               <p className="muted cart-pay__note">
-                Paying with{" "}
-                <strong>{PAYMENT_OPTIONS.find((o) => o.id === payment)?.label}</strong> to the
-                selected address.
+                Payment is collected online before your order is confirmed.
               </p>
             </section>
           ) : null}
