@@ -1281,6 +1281,15 @@ a:hover {
   border-radius: 6px;
 }
 
+.order-history__status--failed {
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+.order-history__value--failed {
+  color: #b91c1c;
+}
+
 .order-history__dl {
   margin: 0;
 }

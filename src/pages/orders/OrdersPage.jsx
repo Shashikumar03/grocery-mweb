@@ -52,6 +52,25 @@ function getPaymentStatus(o) {
   return s != null ? String(s).trim() : "";
 }
 
+/** @param {string} paymentStatus */
+function isPaymentFailed(paymentStatus) {
+  if (!paymentStatus) return false;
+  const key = paymentStatus.toUpperCase().replace(/\s+/g, "_");
+  return key === "FAILED" || key === "FAILURE";
+}
+
+/**
+ * @param {Record<string, unknown>} o
+ * @returns {{ label: string; failed: boolean }}
+ */
+function getOrderHeadStatus(o) {
+  const paymentStatus = getPaymentStatus(o);
+  if (isPaymentFailed(paymentStatus)) {
+    return { label: "FAILED", failed: true };
+  }
+  return { label: getDeliveryStatus(o), failed: false };
+}
+
 /** @param {Record<string, unknown>} o */
 function getPaymentAmount(o) {
   const payment = getPaymentDto(o);
@@ -157,11 +176,17 @@ export function OrdersPage() {
                 const amount = getPaymentAmount(o);
                 const addr = formatAddressSnippet(o);
                 const paymentStatus = getPaymentStatus(o);
+                const headStatus = getOrderHeadStatus(o);
+                const paymentFailed = isPaymentFailed(paymentStatus);
                 return (
                   <li key={key} className="order-history__card">
                     <div className="order-history__head">
                       <span className="order-history__id">Order #{id}</span>
-                      <span className="order-history__status">{getDeliveryStatus(o)}</span>
+                      <span
+                        className={`order-history__status${headStatus.failed ? " order-history__status--failed" : ""}`}
+                      >
+                        {headStatus.label}
+                      </span>
                     </div>
                     <dl className="order-history__dl">
                       <div className="order-history__row">
@@ -174,7 +199,17 @@ export function OrdersPage() {
                       </div>
                       <div className="order-history__row">
                         <dt>Payment status</dt>
-                        <dd>{paymentStatus || "—"}</dd>
+                        <dd
+                          className={
+                            paymentFailed ? "order-history__value--failed" : undefined
+                          }
+                        >
+                          {paymentStatus || "—"}
+                        </dd>
+                      </div>
+                      <div className="order-history__row">
+                        <dt>Delivery status</dt>
+                        <dd>{getDeliveryStatus(o)}</dd>
                       </div>
                       {amount != null ? (
                         <div className="order-history__row">
