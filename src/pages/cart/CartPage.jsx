@@ -639,7 +639,7 @@ export function CartPage() {
         message={orderError}
         confirmLabel="OK"
         variant="error"
-        autoCloseMs={1000}
+        autoCloseMs={2000}
       />
     </Screen>
   );
