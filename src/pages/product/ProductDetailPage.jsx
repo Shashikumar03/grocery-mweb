@@ -3,6 +3,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { Screen } from "../../components/common/Screen.jsx";
 import { AuthPromptModal } from "../../components/auth/AuthPromptModal.jsx";
 import { fetchProductById } from "../../services/catalog/index.js";
+import { AdSenseBanner } from "../../components/ads/AdSenseBanner.jsx";
 import { AddedToCartCta } from "../../components/cart/AddedToCartCta.jsx";
 import { addProductToCart } from "../../services/cart/index.js";
 import { useCartCount } from "../../context/CartCountContext.jsx";
@@ -117,6 +118,8 @@ export function ProductDetailPage() {
               />
             )}
           </div>
+
+          <AdSenseBanner className="adsense-banner--pdp" />
 
           <p className="pdp-price-row">
             <span className="pdp-price">

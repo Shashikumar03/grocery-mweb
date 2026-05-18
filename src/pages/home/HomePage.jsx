@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Screen } from "../../components/common/Screen.jsx";
 import { HomeIplEntry } from "../../components/home/HomeIplEntry.jsx";
 import { HomeLottieBanners } from "../../components/home/HomeLottieBanners.jsx";
+import { AdSenseBanner } from "../../components/ads/AdSenseBanner.jsx";
 import { HomeThandaSection } from "../../components/home/HomeThandaSection.jsx";
 import { readAuthSession } from "../../utils/authSession.js";
 
@@ -40,6 +41,8 @@ export function HomePage() {
       </header>
 
       <HomeLottieBanners />
+
+      <AdSenseBanner className="adsense-banner--home" />
 
       <HomeIplEntry />
 

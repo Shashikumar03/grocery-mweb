@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Screen } from "../../components/common/Screen.jsx";
 import { SearchResultsShimmer } from "../../components/common/Shimmer.jsx";
+import { AdSenseBanner } from "../../components/ads/AdSenseBanner.jsx";
 import { CategoryProductCard } from "../../components/categories/CategoryProductCard.jsx";
 import { searchProducts } from "../../services/catalog/index.js";
 import { getReadableFetchError } from "../../utils/fetchError.js";
@@ -131,6 +132,7 @@ export function SearchPage() {
                     </li>
                   ))}
                 </ul>
+                <AdSenseBanner className="adsense-banner--search" />
               </>
             )}
           </section>
