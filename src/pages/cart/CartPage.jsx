@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Screen } from "../../components/common/Screen.jsx";
 import { CartPageShimmer } from "../../components/common/Shimmer.jsx";
+import { AlertModal } from "../../components/common/AlertModal.jsx";
 import { CartLineItem } from "../../components/cart/CartLineItem.jsx";
 import { OrderTrackingOverlay } from "../../components/cart/OrderTrackingOverlay.jsx";
 import { fetchDeliveryAddresses, getDeliveryAddressId } from "../../services/address/index.js";
@@ -24,18 +25,20 @@ import {
 import { openCheckoutWithRetry } from "../../utils/openCheckoutWithRetry.js";
 import { loadRazorpayScript } from "../../utils/loadRazorpayScript.js";
 import {
+  PAYMENT_MODE_CASH_ON_DELIVERY,
+  PAYMENT_MODE_ONLINE,
+} from "../../constants/paymentModes.js";
+import {
   cartItemsFromPlaceOrderResponse,
   cartTotalFromPlaceOrderResponse,
   formatAddressFromOrderResponse,
   formatAddressOneLine,
   inrToPaise,
+  isCashOnDeliveryMode,
   pickFromOrderResponse,
   pickRazorpayFromOrderResponse,
 } from "../../utils/placeOrderResponse.js";
 import { normalizeCart, sortCartItems } from "../../utils/cartItems.js";
-
-const PAYMENT_MODE = "ONLINE";
-const PAYMENT_LABEL = "Pay";
 
 const DELIVERY_ETA_MINUTES = 20;
 
@@ -76,6 +79,7 @@ export function CartPage() {
   const [addressesLoading, setAddressesLoading] = useState(false);
   const [addressesError, setAddressesError] = useState("");
   const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [paymentMode, setPaymentMode] = useState(PAYMENT_MODE_ONLINE);
 
   const [orderSubmitting, setOrderSubmitting] = useState(false);
   const [orderError, setOrderError] = useState("");
@@ -169,7 +173,8 @@ export function CartPage() {
     }
     const addressRow = addresses.find((r) => getDeliveryAddressId(r) === selectedAddressId);
     const addressLine = addressRow ? formatAddressOneLine(addressRow) : "";
-    const paymentLabel = PAYMENT_LABEL;
+    const isCod = isCashOnDeliveryMode(paymentMode);
+    const paymentLabel = isCod ? "Cash on delivery" : "Pay online";
     const itemsCopy = cartLines.map((row) => ({ ...row }));
     const total =
       cart?.cartTotalPrice != null ? Number(cart.cartTotalPrice) : null;
@@ -178,8 +183,20 @@ export function CartPage() {
 
     setOrderSubmitting(true);
     try {
-      const parsed = await placeOrder(userId, selectedAddressId, PAYMENT_MODE);
+      const parsed = await placeOrder(userId, selectedAddressId, paymentMode);
       const fromApi = pickFromOrderResponse(parsed);
+
+      if (isCod) {
+        setTrackingDetails(buildTrackingFromOrder(parsed, extras));
+        try {
+          const data = await fetchCart(userId, { clearSessionOn401: false });
+          setCart(data);
+          syncCartFromResponse(data);
+        } catch {
+          /* best-effort refresh */
+        }
+        return;
+      }
 
       const { razorpayOrderId, amountInr } = pickRazorpayFromOrderResponse(parsed);
       const amountPaise = inrToPaise(
@@ -263,6 +280,7 @@ export function CartPage() {
     userId,
     token,
     selectedAddressId,
+    paymentMode,
     cart,
     addresses,
     loadCart,
@@ -361,6 +379,12 @@ export function CartPage() {
   const discount =
     cart?.discountAmount != null ? Number(cart.discountAmount) : 0;
   const status = cart?.status != null ? String(cart.status) : "";
+  const isCodSelected = isCashOnDeliveryMode(paymentMode);
+  const placeOrderCta = orderSubmitting
+    ? "Processing…"
+    : isCodSelected
+      ? "Place order"
+      : "Pay";
 
   return (
     <Screen title="Cart">
@@ -529,14 +553,49 @@ export function CartPage() {
               <h2 id="pay-heading" className="cart-pay__title">
                 Payment
               </h2>
-              <p className="muted cart-pay__intro">
-                UPI, debit/credit card, or net banking.
-              </p>
-              {orderError ? (
-                <p className="form-error" role="alert">
-                  {orderError}
-                </p>
-              ) : null}
+              <p className="muted cart-pay__intro">Choose how you want to pay.</p>
+              <ul className="cart-pay__list" role="radiogroup" aria-label="Payment method">
+                <li>
+                  <label
+                    className={`cart-pay__option${paymentMode === PAYMENT_MODE_ONLINE ? " cart-pay__option--selected" : ""}`}
+                  >
+                    <input
+                      type="radio"
+                      name="cart-payment-mode"
+                      value={PAYMENT_MODE_ONLINE}
+                      checked={paymentMode === PAYMENT_MODE_ONLINE}
+                      disabled={orderSubmitting}
+                      onChange={() => setPaymentMode(PAYMENT_MODE_ONLINE)}
+                    />
+                    <span className="cart-pay__option-body">
+                      <span className="cart-pay__option-label">Pay online</span>
+                      <span className="cart-pay__option-hint muted">
+                        UPI, debit/credit card, or net banking
+                      </span>
+                    </span>
+                  </label>
+                </li>
+                <li>
+                  <label
+                    className={`cart-pay__option${paymentMode === PAYMENT_MODE_CASH_ON_DELIVERY ? " cart-pay__option--selected" : ""}`}
+                  >
+                    <input
+                      type="radio"
+                      name="cart-payment-mode"
+                      value={PAYMENT_MODE_CASH_ON_DELIVERY}
+                      checked={paymentMode === PAYMENT_MODE_CASH_ON_DELIVERY}
+                      disabled={orderSubmitting}
+                      onChange={() => setPaymentMode(PAYMENT_MODE_CASH_ON_DELIVERY)}
+                    />
+                    <span className="cart-pay__option-body">
+                      <span className="cart-pay__option-label">Cash on delivery</span>
+                      <span className="cart-pay__option-hint muted">
+                        Pay with cash when your order arrives
+                      </span>
+                    </span>
+                  </label>
+                </li>
+              </ul>
               <button
                 type="button"
                 className="form-submit cart-pay__cta"
@@ -548,10 +607,12 @@ export function CartPage() {
                 }
                 onClick={() => void handlePlaceOrder()}
               >
-                {orderSubmitting ? "Processing…" : "Pay"}
+                {placeOrderCta}
               </button>
               <p className="muted cart-pay__note">
-                Payment is collected online before your order is confirmed.
+                {isCodSelected
+                  ? "You will pay in cash when the order is delivered."
+                  : "Payment is collected online before your order is confirmed."}
               </p>
             </section>
           ) : null}
@@ -570,6 +631,16 @@ export function CartPage() {
           </p>
         </>
       ) : null}
+
+      <AlertModal
+        open={Boolean(orderError)}
+        onClose={() => setOrderError("")}
+        title="Payment could not be completed"
+        message={orderError}
+        confirmLabel="OK"
+        variant="error"
+        autoCloseMs={1000}
+      />
     </Screen>
   );
 }

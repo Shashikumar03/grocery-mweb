@@ -2083,6 +2083,18 @@ a:hover {
   color: var(--color-text);
 }
 
+.modal-card--error .modal-card__title {
+  color: #b91c1c;
+}
+
+.modal-card--error .modal-card__desc {
+  color: var(--color-text);
+}
+
+.modal-card--error .modal-card__primary {
+  background: #b91c1c;
+}
+
 .order-tracking-overlay {
   position: fixed;
   inset: 0;
