@@ -8,7 +8,7 @@ export function SiteFooter() {
           About
         </Link>
         <Link to="/contact" className="site-footer__link">
-          Contact
+          Help
         </Link>
         <Link to="/faq" className="site-footer__link">
           FAQ

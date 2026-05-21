@@ -12,7 +12,7 @@ import { AddressesPage } from "../pages/account/AddressesPage.jsx";
 import { SignUpPage } from "../pages/auth/SignUpPage.jsx";
 import { LoginPage } from "../pages/auth/LoginPage.jsx";
 import { NotFoundPage } from "../pages/errors/NotFoundPage.jsx";
-import { IplPredictPage } from "../pages/ipl/IplPredictPage.jsx";
+import { IplRoute } from "./IplRoute.jsx";
 import { AboutPage } from "../pages/legal/AboutPage.jsx";
 import { ContactPage } from "../pages/legal/ContactPage.jsx";
 import { PrivacyPage } from "../pages/legal/PrivacyPage.jsx";
@@ -29,7 +29,7 @@ export const routes = [
   { path: "/cart", element: <CartPage /> },
   { path: "/checkout", element: <CheckoutPage /> },
   { path: "/orders", element: <OrdersPage /> },
-  { path: "/ipl", element: <IplPredictPage /> },
+  { path: "/ipl", element: <IplRoute /> },
   { path: "/account", element: <AccountPage /> },
   { path: "/account/addresses", element: <AddressesPage /> },
   { path: "/privacy", element: <PrivacyPage /> },

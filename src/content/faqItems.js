@@ -1,3 +1,5 @@
+import { CONTACT_EMAIL } from "../constants/site.js";
+
 /** @type {Array<{ q: string; a: string }>} */
 export const FAQ_ITEMS = [
   {
@@ -46,6 +48,6 @@ export const FAQ_ITEMS = [
   },
   {
     q: "How can I contact Bazzari?",
-    a: "Visit the contact page on this website for email or phone details. Include your order number for faster help with delivery or payment issues.",
+    a: `Email ${CONTACT_EMAIL} for help and support, or visit the contact page on this website. Include your order number for faster help with delivery or payment issues.`,
   },
 ];

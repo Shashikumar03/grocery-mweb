@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { SiteProse } from "../../components/content/SiteProse.jsx";
 import { Screen } from "../../components/common/Screen.jsx";
 import { HomeIplEntry } from "../../components/home/HomeIplEntry.jsx";
+import { IPL_PROMO_ENABLED } from "../../constants/features.js";
 import { HomeLottieBanners } from "../../components/home/HomeLottieBanners.jsx";
 import { AdSenseBanner } from "../../components/ads/AdSenseBanner.jsx";
 import { HomeThandaSection } from "../../components/home/HomeThandaSection.jsx";
@@ -45,21 +46,6 @@ export function HomePage() {
           a few minutes from your phone.
         </p>
       </header>
-
-      <SiteProse title={`About ${SITE_NAME}`}>
-        <p>
-          We built {SITE_NAME} for families who want a simple way to restock groceries without
-          visiting multiple shops. Our online shop lists real products with current prices. You
-          can search by name, browse by category, and build a cart at your own pace before you
-          pay.
-        </p>
-        <p>
-          Delivery is arranged to the address you save in your account. Many customers use online
-          payment for a quick checkout; cash on delivery is also available when offered at
-          payment time. After you place an order, you can track its status from your order
-          history when you are signed in.
-        </p>
-      </SiteProse>
 
       <SiteProse title="How ordering works">
         <p>
@@ -152,6 +138,15 @@ export function HomePage() {
               <span className="home-action__hint muted">Track past purchases</span>
             </span>
           </Link>
+          <Link to="/about" className="home-action">
+            <span className="home-action__icon" aria-hidden>
+              ℹ️
+            </span>
+            <span className="home-action__body">
+              <span className="home-action__label">About {SITE_NAME}</span>
+              <span className="home-action__hint muted">Who we are and how we deliver</span>
+            </span>
+          </Link>
         </div>
       </section>
 
@@ -165,7 +160,8 @@ export function HomePage() {
         <p>
           If you have questions about a product, delivery, or payment, see our{" "}
           <Link to="/faq">FAQ</Link>, <Link to="/delivery">delivery information</Link>, or{" "}
-          <Link to="/contact">contact page</Link>. Read how we handle personal data in our{" "}
+          <Link to="/contact">help and support</Link>. Learn more on our{" "}
+          <Link to="/about">about page</Link>. Read how we handle personal data in our{" "}
           <Link to="/privacy">privacy policy</Link> and general rules in our{" "}
           <Link to="/terms">terms of use</Link>.
         </p>
@@ -173,14 +169,18 @@ export function HomePage() {
 
       <AdSenseBanner className="adsense-banner--home" />
 
-      <SiteProse title="Optional: match predictions">
-        <p>
-          From time to time we run separate sports prediction promotions for signed-in customers.
-          These are optional and are not required to shop for groceries. The main {SITE_NAME}{" "}
-          service is online grocery ordering and delivery described above.
-        </p>
-      </SiteProse>
-      <HomeIplEntry />
+      {IPL_PROMO_ENABLED ? (
+        <>
+          <SiteProse title="Optional: match predictions">
+            <p>
+              From time to time we run separate sports prediction promotions for signed-in
+              customers. These are optional and are not required to shop for groceries. The main{" "}
+              {SITE_NAME} service is online grocery ordering and delivery described above.
+            </p>
+          </SiteProse>
+          <HomeIplEntry />
+        </>
+      ) : null}
     </Screen>
   );
 }

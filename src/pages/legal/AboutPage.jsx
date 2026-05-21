@@ -13,10 +13,15 @@ export function AboutPage() {
     >
       <SiteProse>
         <p>
-          <strong>{SITE_NAME}</strong> is an online grocery service built for customers who want
-          everyday shopping to be simple and transparent. We list real products with current
-          prices, show whether each item is in stock, and deliver orders to the address you
-          choose at checkout.
+          We built <strong>{SITE_NAME}</strong> for families who want a simple way to restock
+          groceries without visiting multiple shops. Our online shop lists real products with
+          current prices. You can search by name, browse by category, and build a cart at your own
+          pace before you pay.
+        </p>
+        <p>
+          {SITE_NAME} is an online grocery service built for customers who want everyday
+          shopping to be simple and transparent. We show whether each item is in stock and
+          deliver orders to the address you choose at checkout.
         </p>
         <p>
           Our shop is open on the web at{" "}
@@ -44,10 +49,11 @@ export function AboutPage() {
 
       <SiteProse title="Delivery and payment">
         <p>
-          At checkout you select where groceries should be delivered. We support secure online
-          payment through our payment partner, and cash on delivery in areas where that option is
-          enabled. After your order is placed, you can follow its progress from the orders section
-          when you are logged in.
+          Delivery is arranged to the address you save in your account. At checkout you select
+          where groceries should be delivered. We support secure online payment through our
+          payment partner, and cash on delivery in areas where that option is enabled. After your
+          order is placed, you can follow its progress from the orders section when you are logged
+          in.
         </p>
         <p>
           If something goes wrong with payment or delivery, contact us using the details on our{" "}

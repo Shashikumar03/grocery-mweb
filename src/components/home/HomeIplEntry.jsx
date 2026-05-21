@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Lottie from "lottie-react";
+import { IPL_PROMO_ENABLED } from "../../constants/features.js";
 
 const IPL_LOTTIE_URL =
   "https://assets3.lottiefiles.com/packages/lf20_ukaaovr.json";
@@ -41,6 +42,8 @@ function IplLottie() {
 }
 
 export function HomeIplEntry() {
+  if (!IPL_PROMO_ENABLED) return null;
+
   return (
     <Link to="/ipl" className="home-ipl-entry">
       <div className="home-ipl-entry__visual">

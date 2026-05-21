@@ -9,10 +9,10 @@ export const SITE_NAME =
   (import.meta.env.VITE_SITE_NAME && String(import.meta.env.VITE_SITE_NAME).trim()) ||
   "Bazzari";
 
-/** Shown on Contact page — set VITE_CONTACT_EMAIL in Netlify for AdSense review. */
+/** Help & support email — override with VITE_CONTACT_EMAIL in Netlify if needed. */
 export const CONTACT_EMAIL =
   (import.meta.env.VITE_CONTACT_EMAIL && String(import.meta.env.VITE_CONTACT_EMAIL).trim()) ||
-  "";
+  "shashikumarkushwaha1@gmail.com";
 
 export const CONTACT_PHONE =
   (import.meta.env.VITE_CONTACT_PHONE && String(import.meta.env.VITE_CONTACT_PHONE).trim()) ||

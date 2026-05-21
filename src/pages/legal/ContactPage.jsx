@@ -6,32 +6,23 @@ import { CONTACT_EMAIL, CONTACT_PHONE, SITE_NAME } from "../../constants/site.js
 export function ContactPage() {
   return (
     <Screen
-      title="Contact us"
-      metaDescription={`Contact ${SITE_NAME} for order help, delivery questions, or account support.`}
+      title="Help and support"
+      metaDescription={`Help and support for ${SITE_NAME} — email ${CONTACT_EMAIL} for orders, delivery, payments, and account questions.`}
     >
       <SiteProse>
         <p>
-          We welcome questions from customers and partners of <strong>{SITE_NAME}</strong>. Whether
-          you need help with an order, a payment, a delivery, or your account, use the contact
-          details below. Please include your order number if your message is about a specific
-          purchase so we can find it quickly.
+          Need help with <strong>{SITE_NAME}</strong>? Whether you have a question about an order,
+          payment, delivery, or your account, reach us using the email below. Include your order
+          number when your message is about a specific purchase so we can find it quickly.
         </p>
       </SiteProse>
 
-      <SiteProse title="How to reach us">
-        {CONTACT_EMAIL ? (
-          <p>
-            Email us at{" "}
-            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. We read messages on business
-            days and try to reply within one working day.
-          </p>
-        ) : (
-          <p>
-            Email support will appear here once configured. If you operate this shop, add your
-            business email as <code>VITE_CONTACT_EMAIL</code> in your hosting settings so
-            customers can reach you directly.
-          </p>
-        )}
+      <SiteProse title="Email support">
+        <p>
+          For help and support, email{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. We read messages on business
+          days and try to reply within one working day.
+        </p>
         {CONTACT_PHONE ? (
           <p>
             You can also call us at{" "}

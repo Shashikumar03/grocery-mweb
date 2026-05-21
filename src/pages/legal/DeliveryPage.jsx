@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { SiteProse } from "../../components/content/SiteProse.jsx";
 import { Screen } from "../../components/common/Screen.jsx";
-import { SITE_NAME } from "../../constants/site.js";
+import { CONTACT_EMAIL, SITE_NAME } from "../../constants/site.js";
 
 export function DeliveryPage() {
   return (
@@ -46,13 +46,16 @@ export function DeliveryPage() {
         <p>
           We expand delivery coverage over time. Enter your full address during checkout to see
           whether we can accept the order. If you are outside our current area, the website may
-          not allow checkout — contact us with your location details and we will advise you.
+          not allow checkout — email{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> with your location details and
+          we will advise you.
         </p>
       </SiteProse>
 
       <SiteProse title="Missing or incorrect items">
         <p>
-          If something is missing or incorrect, contact us promptly with your order number and
+          If something is missing or incorrect, email{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> promptly with your order number and
           a short description of the issue. We take product quality seriously and will work with
           you to resolve genuine problems according to our store policies.
         </p>
