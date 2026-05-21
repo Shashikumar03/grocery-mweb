@@ -13,7 +13,12 @@ import { SignUpPage } from "../pages/auth/SignUpPage.jsx";
 import { LoginPage } from "../pages/auth/LoginPage.jsx";
 import { NotFoundPage } from "../pages/errors/NotFoundPage.jsx";
 import { IplPredictPage } from "../pages/ipl/IplPredictPage.jsx";
+import { AboutPage } from "../pages/legal/AboutPage.jsx";
+import { ContactPage } from "../pages/legal/ContactPage.jsx";
 import { PrivacyPage } from "../pages/legal/PrivacyPage.jsx";
+import { TermsPage } from "../pages/legal/TermsPage.jsx";
+import { FaqPage } from "../pages/legal/FaqPage.jsx";
+import { DeliveryPage } from "../pages/legal/DeliveryPage.jsx";
 
 export const routes = [
   { path: "/", element: <HomePage /> },
@@ -28,6 +33,11 @@ export const routes = [
   { path: "/account", element: <AccountPage /> },
   { path: "/account/addresses", element: <AddressesPage /> },
   { path: "/privacy", element: <PrivacyPage /> },
+  { path: "/about", element: <AboutPage /> },
+  { path: "/contact", element: <ContactPage /> },
+  { path: "/terms", element: <TermsPage /> },
+  { path: "/faq", element: <FaqPage /> },
+  { path: "/delivery", element: <DeliveryPage /> },
   { path: "/signup", element: <SignUpPage /> },
   { path: "/auth/login", element: <LoginPage /> },
   { path: "/404", element: <NotFoundPage /> },

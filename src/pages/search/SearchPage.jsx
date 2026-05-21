@@ -3,7 +3,9 @@ import { useSearchParams } from "react-router-dom";
 import { Screen } from "../../components/common/Screen.jsx";
 import { SearchResultsShimmer } from "../../components/common/Shimmer.jsx";
 import { AdSenseBanner } from "../../components/ads/AdSenseBanner.jsx";
+import { SiteProse } from "../../components/content/SiteProse.jsx";
 import { CategoryProductCard } from "../../components/categories/CategoryProductCard.jsx";
+import { SITE_NAME } from "../../constants/site.js";
 import { searchProducts } from "../../services/catalog/index.js";
 import { getReadableFetchError } from "../../utils/fetchError.js";
 
@@ -65,8 +67,19 @@ export function SearchPage() {
   }
 
   return (
-    <Screen title="Search">
+    <Screen
+      title="Search groceries"
+      metaDescription={`Search the ${SITE_NAME} catalogue by product name. Find groceries, compare prices, and add items to your cart.`}
+    >
       <div className="search-page">
+        <SiteProse className="site-prose--tight">
+          <p>
+            Use this page to find products across the {SITE_NAME} catalogue by name. Type what you
+            are looking for — for example fruit, rice, cooking oil, or a brand of soft drink —
+            and press Search. Matching items appear with prices so you can open a product and add
+            it to your cart.
+          </p>
+        </SiteProse>
         <form className="search-form" onSubmit={handleSubmit}>
           <label className="search-form__label" htmlFor="search-q">
             Search products
@@ -140,10 +153,10 @@ export function SearchPage() {
 
         {!urlQuery && !loading ? (
           <div className="search-empty search-empty--hint">
-            <p className="search-empty__title">Find groceries</p>
-            <p className="search-empty__text muted">
-              Search by product name. Uses{" "}
-              <code className="search-code">GET /api/product/search?name=…</code>
+            <p className="search-empty__title">Search our grocery catalogue</p>
+            <p className="search-empty__text">
+              Enter a product name above to see items we currently sell. You can also browse all
+              categories on the shop page if you prefer to explore aisle by aisle.
             </p>
           </div>
         ) : null}

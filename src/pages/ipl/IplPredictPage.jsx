@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { SiteProse } from "../../components/content/SiteProse.jsx";
 import { Screen } from "../../components/common/Screen.jsx";
+import { SITE_NAME } from "../../constants/site.js";
 import { AuthPromptModal } from "../../components/auth/AuthPromptModal.jsx";
 import { MatchPredictionCard } from "../../components/ipl/MatchPredictionCard.jsx";
 import { IPL_MATCHES } from "../../data/iplMatches.js";
@@ -46,10 +48,24 @@ export function IplPredictPage() {
   );
 
   return (
-    <Screen title="IPL Predictions">
+    <Screen
+      title="IPL Predictions"
+      metaDescription="Optional IPL match prediction promotion on Bazzari. Grocery shopping is the main service on our home and shop pages."
+      noindex
+    >
       <p className="ipl-back">
         <Link to="/">← Back to home</Link>
       </p>
+
+      <SiteProse>
+        <p>
+          This page is an optional promotion separate from everyday grocery shopping on{" "}
+          {SITE_NAME}. Our primary service is ordering food and household products for home
+          delivery from the <Link to="/categories">shop</Link> page. Match predictions are for
+          entertainment only and may offer cashback to eligible signed-in customers according to
+          promotion rules.
+        </p>
+      </SiteProse>
 
       <header className="ipl-hero">
         <p className="ipl-hero__badge">IPL 2026 · Cashback league</p>

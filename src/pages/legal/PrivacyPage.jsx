@@ -1,23 +1,32 @@
 import { Link } from "react-router-dom";
 import { Screen } from "../../components/common/Screen.jsx";
 import { ADSENSE_CLIENT } from "../../constants/adsense.js";
-import { SITE_URL } from "../../constants/site.js";
+import { CONTACT_EMAIL, CONTACT_PHONE, SITE_NAME, SITE_URL } from "../../constants/site.js";
 
 export function PrivacyPage() {
   return (
-    <Screen title="Privacy Policy">
+    <Screen
+      title="Privacy Policy"
+      metaDescription={`Privacy policy for ${SITE_NAME} — how we collect, use, and protect your personal data.`}
+    >
       <p className="muted privacy-updated">Last updated: May 2026</p>
 
       <section className="privacy-section">
         <h2 className="privacy-section__title">Who we are</h2>
         <p>
-          This grocery portal at{" "}
+          <strong>{SITE_NAME}</strong> at{" "}
           <a href={SITE_URL} target="_blank" rel="noopener noreferrer">
             {SITE_URL.replace(/^https?:\/\//, "")}
           </a>{" "}
-          lets you browse products, manage a cart, place orders, and pay online. If you have
-          questions about this policy, contact us through the support channel listed on your
-          account or store listing.
+          lets you browse products, manage a cart, place orders, and pay online or on delivery.
+          Questions about this policy: see our <Link to="/contact">Contact</Link> page
+          {CONTACT_EMAIL ? (
+            <>
+              {" "}
+              or email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+            </>
+          ) : null}
+          {CONTACT_PHONE ? <> or call {CONTACT_PHONE}</> : null}.
         </p>
       </section>
 
@@ -93,7 +102,11 @@ export function PrivacyPage() {
       </section>
 
       <p className="privacy-back">
-        <Link to="/">← Back to home</Link>
+        <Link to="/about">About</Link>
+        {" · "}
+        <Link to="/terms">Terms</Link>
+        {" · "}
+        <Link to="/">Home</Link>
       </p>
     </Screen>
   );
