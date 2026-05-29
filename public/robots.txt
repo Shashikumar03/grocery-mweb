@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /ipl
+Disallow: /preview-qr.html
 
 User-agent: Mediapartners-Google
 Allow: /

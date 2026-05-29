@@ -159,7 +159,8 @@ export function HomePage() {
         </p>
         <p>
           If you have questions about a product, delivery, or payment, see our{" "}
-          <Link to="/faq">FAQ</Link>, <Link to="/delivery">delivery information</Link>, or{" "}
+          <Link to="/faq">FAQ</Link>, <Link to="/guide">shopping guide</Link>,{" "}
+          <Link to="/delivery">delivery information</Link>, or{" "}
           <Link to="/contact">help and support</Link>. Learn more on our{" "}
           <Link to="/about">about page</Link>. Read how we handle personal data in our{" "}
           <Link to="/privacy">privacy policy</Link> and general rules in our{" "}

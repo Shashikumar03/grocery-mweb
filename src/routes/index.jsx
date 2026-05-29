@@ -19,6 +19,7 @@ import { PrivacyPage } from "../pages/legal/PrivacyPage.jsx";
 import { TermsPage } from "../pages/legal/TermsPage.jsx";
 import { FaqPage } from "../pages/legal/FaqPage.jsx";
 import { DeliveryPage } from "../pages/legal/DeliveryPage.jsx";
+import { GroceryGuidePage } from "../pages/legal/GroceryGuidePage.jsx";
 
 export const routes = [
   { path: "/", element: <HomePage /> },
@@ -38,6 +39,7 @@ export const routes = [
   { path: "/terms", element: <TermsPage /> },
   { path: "/faq", element: <FaqPage /> },
   { path: "/delivery", element: <DeliveryPage /> },
+  { path: "/guide", element: <GroceryGuidePage /> },
   { path: "/signup", element: <SignUpPage /> },
   { path: "/auth/login", element: <LoginPage /> },
   { path: "/404", element: <NotFoundPage /> },

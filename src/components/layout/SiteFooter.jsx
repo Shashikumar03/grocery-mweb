@@ -16,6 +16,9 @@ export function SiteFooter() {
         <Link to="/delivery" className="site-footer__link">
           Delivery
         </Link>
+        <Link to="/guide" className="site-footer__link">
+          Guide
+        </Link>
         <Link to="/privacy" className="site-footer__link">
           Privacy
         </Link>

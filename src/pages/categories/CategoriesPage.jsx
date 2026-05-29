@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Screen } from "../../components/common/Screen.jsx";
 import { ShopPageShimmer } from "../../components/common/Shimmer.jsx";
 import { SiteProse } from "../../components/content/SiteProse.jsx";
@@ -47,7 +48,8 @@ export function CategoriesPage() {
         <p>
           Our catalogue includes fresh and packaged groceries, household staples, and a dedicated
           section for chilled beverages. Prices are shown in Indian rupees. If you cannot find
-          an item, use the search page to look it up by name.
+          an item, use the search page to look it up by name. For planning tips, read our{" "}
+          <Link to="/guide">grocery shopping guide</Link>.
         </p>
       </SiteProse>
 

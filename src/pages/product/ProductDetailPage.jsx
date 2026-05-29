@@ -6,6 +6,7 @@ import { fetchProductById } from "../../services/catalog/index.js";
 import { SiteProse } from "../../components/content/SiteProse.jsx";
 import { AdSenseBanner } from "../../components/ads/AdSenseBanner.jsx";
 import { SITE_NAME } from "../../constants/site.js";
+import { getProductIntroText } from "../../utils/productIntro.js";
 import { AddedToCartCta } from "../../components/cart/AddedToCartCta.jsx";
 import { addProductToCart } from "../../services/cart/index.js";
 import { useCartCount } from "../../context/CartCountContext.jsx";
@@ -148,12 +149,7 @@ export function ProductDetailPage() {
             {product.description ? (
               <p>{String(product.description)}</p>
             ) : null}
-            <p>
-              You are viewing {String(product.name ?? "this product")} on {SITE_NAME}. The price
-              shown above is what you pay for this listing. Add the quantity you need to your cart,
-              then open the cart page when you are ready to select a delivery address and complete
-              payment online or with cash on delivery if available.
-            </p>
+            <p>{getProductIntroText(product)}</p>
           </SiteProse>
 
           {inv && typeof inv === "object" ? (
